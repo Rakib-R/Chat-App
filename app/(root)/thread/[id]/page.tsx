@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation'
 import { fetchThreadById } from '@/lib/actions/thread.actions'
 import { Comment } from '@/components/forms/Comments'
 
-const  Page = async ({params , searchParams} :Readonly< { params : Promise<{ id : string }>; searchParams : { q : string | string[] | undefined };
+const  Page = async ({params , searchParams} :Readonly< { params : Promise<{ id : string }>; searchParams : Promise<{ q : string | string[] | undefined }>;
   }>) => {
 
   const user = await currentUser();
