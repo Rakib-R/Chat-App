@@ -25,6 +25,8 @@ async function Home ({ searchParams}:  PageProps) {
   const result = await fetchPosts(1, 20) ;
   const userInfo = await fetchUser(user.id)
 
+  // **** ORGANIZATION FETCHING  ****
+
   const isAdmin = orgRole === "org:admin"; 
   const isMember = orgRole === "org:member";
 
@@ -37,7 +39,16 @@ async function Home ({ searchParams}:  PageProps) {
   const org: Organization = await client.organizations.getOrganization({ 
     organizationId: orgId 
     });
-    
+
+    // ORGANIZATION MEMBERSSS
+     const memberships = await client.organizations.getOrganizationMembershipList({
+    organizationId: orgId,
+    limit: 10, 
+      });
+
+    const members = memberships.data;
+
+    // ORGANIZATION USER DETAILS
     let orgDetails = org;
 
     if (orgId && orgDetails) {
@@ -51,8 +62,7 @@ async function Home ({ searchParams}:  PageProps) {
       createdById :user.id }
     );
 }
-
-    console.log('%cSERIOUS Organization Id at AccProfile', 'font-size:16px; color:green', orgDetails , orgDetails?.id) 
+    console.log('%cMembers', 'font-size:14px; color:green', members , orgDetails?.id) 
   
     return (
     <div className=' text-2xl text-black text-center'>
@@ -77,6 +87,7 @@ async function Home ({ searchParams}:  PageProps) {
               role={isAdmin || isMember}
               orgName={orgDetails.name}
               orgImg={orgDetails.imageUrl as string}
+              orgMembers={members}
               
             />
           ))}

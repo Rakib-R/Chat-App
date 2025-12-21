@@ -53,15 +53,14 @@ export default async function  RootLayout ({
 
   
     const customAppearance = {
-      // 1. Base Theme: Start with a dark theme
+   
       // theme: shadesOfPurple ,
       cssLayerName :  'clerk',
       variables: {
-        colorPrimary: 'white', // A bright, distinct primary color
-        colorTextSecondary : 'white', // SECURED BYH CLERK
+        colorPrimary: 'white',
+        colorTextSecondary : 'white',
 
         colorBackground: '', // Deep, charcoal background
-        
         colorForeground: 'red',
         colorText: 'green', // Light, distinct text
 
@@ -84,7 +83,6 @@ export default async function  RootLayout ({
           backgroundColor: "black", // CSS Object style
           border: "1px solid rgba(255,255,255,0.1)"
         },
-        // Use className for Tailwind strings
         formButtonPrimary: {
         className: "!bg-indigo-600 hover:!bg-indigo-700 !transition-all !duration-300 !rounded-lg !py-3 !text-lg !font-bold !uppercase"
       },

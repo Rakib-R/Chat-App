@@ -131,53 +131,8 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
         </div>
 
         EXPERIMENTAL UPLOAD
-        <FormField
-          control={form.control}
-          name='profile_photo'
-        render={({ field }) => (
-          <FormItem className=''>
-            <Experimental /> 
-          </FormItem>
-  )}
-  />
   
-        {/* <FormField
-          control={form.control}
-          name='profile_photo'
-          render={({ field }) => (
-            <FormItem className='flex items-center gap-4'>
-              <FormLabel className='account-form_image-label'>
-                {field.value ? (
-                  <Image
-                    src={field.value}
-                    alt='profile_icon'
-                    width={96}
-                    height={96}
-                    priority
-                    className='rounded-full object-contain'
-                  />
-                ) : (
-                  <Image
-                    src='/assets/profile.svg'
-                    alt='profile_icon'
-                    width={24}
-                    height={24}
-                    className='object-contain'
-                  />
-                )}
-              </FormLabel>
-              <FormControl className='flex-1 text-base-semibold text-gray-200'>
-                <Input
-                  type='file'
-                  accept='image/*'
-                  placeholder='Add profile photo'
-                  className='account-form_image-input'
-                  onChange={(e) => handleImage(e, field.onChange)}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        /> */}
+            <Experimental /> 
 
         <FormField
           control={form.control}

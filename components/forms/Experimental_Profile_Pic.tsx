@@ -50,43 +50,43 @@ export const Experimental: FC<props>= ({}) : ReactElement => {
 
       });
 
-const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  useEffect(() => {
-  if (files) {
+      useEffect(() => {
+      if (files) {
 
-    const url = URL.createObjectURL(files);
-    setPreviewUrl(url);
-    return () => URL.revokeObjectURL(url);
-  } 
-}, [files]);
+        const url = URL.createObjectURL(files);
+        setPreviewUrl(url);
+        return () => URL.revokeObjectURL(url);
+      } 
+    }, [files]);
 
-const handleUpload = async () => {
-    if (files) {
-      // startUpload expects an array of File objects
-      await startUpload([files]);
-      // Optional: Clear the preview after successful upload
-      // setFileToUpload(null); 
+      const handleUpload = async () => {
+          if (files) {
+            // startUpload expects an array of File objects
+            await startUpload([files]);
+            // Optional: Clear the preview after successful upload
+            // setFileToUpload(null); 
     }
   };
 
-const baseStyle: CSSProperties = {
-  flex: 1,
-  display: 'flex', flexDirection: 'column',alignItems: 'center',padding: '10px',borderWidth: 2,
-borderColor: 'grey',  borderStyle: 'dashed',outline: 'none',transition: 'border .24s ease-in-out',
+    const baseStyle: CSSProperties = {
+      flex: 1,
+      display: 'flex', flexDirection: 'column',alignItems: 'center',padding: '10px',borderWidth: 2,
+    borderColor: 'grey',  borderStyle: 'dashed',outline: 'none',transition: 'border .24s ease-in-out',
 
-};
+    };
 
-const focusedStyle = {
-  borderColor: 'blue',
-  color: 'red',
-  fontWeight: 'bold'
-}; const acceptStyle = {
-  borderColor: 'red'
-};
-const rejectStyle = {
-  borderColor: 'red'
-};
+    const focusedStyle = {
+      borderColor: 'blue',
+      color: 'red',
+      fontWeight: 'bold'
+    }; const acceptStyle = {
+      borderColor: 'red'
+    };
+    const rejectStyle = {
+      borderColor: 'red'
+    };
 
   const {
     isDragActive,
@@ -111,16 +111,14 @@ const rejectStyle = {
     <div>
         {/* ADDED UPLOADTHING EXPERIMENT */}
 
- <div {...getRootProps()}  className='h-32' >
-      <input {...getInputProps()} />
-  
-  <div  >
-{/*     
-     {isDragAccept ?  ( <div className='w-16 h-16' >DRAGIIHNG  </div>) : ( null) }  
-     {isFocused ? (<div className='w-16 h-16' style={{ border: '21px solid blue' }}>This is from FOCUSED </div> ) : (null)}
-     */}
+    <div {...getRootProps()}  className='h-32' >
+          <input {...getInputProps()} />
+      
+    <div style={isFocused ? {backgroundColor: 'red', color : 'red' , padding : '39px', margin:'55px'} : {color : ''}} >
+        {isDragAccept ?  ( <div className='w-16 h-16' >DRAGIIHNG  </div>) : ( null) }  
+        {isFocused ? (<div className='w-16 h-16' style={{ border: '21px solid blue' }}>This IS PURE STYLE </div> ) : (null)}
 
-{files ? (
+  {files ? (
         <div className="w-32 h-32 rounded-full  text-center">
           {previewUrl && (
             <div className='relative flex rounded-full justify-center items-center w-full h-full'> 

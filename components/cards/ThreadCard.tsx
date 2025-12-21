@@ -4,6 +4,7 @@ import React from 'react'
 import Image from 'next/image';
 import { formatDateString } from '@/lib/utils';
 import { headers } from 'next/headers'
+import { OrganizationMembership } from '@clerk/nextjs/server';
 
 
 interface Props {
@@ -35,7 +36,8 @@ interface Props {
     orgName?: string;
     orgImg?: string;
     role?: string | boolean;
-    // createdAtOrg : number | undefined;
+    orgMembers: OrganizationMembership[];
+   
 }
 
 const ThreadCard = async ({
@@ -52,8 +54,8 @@ const ThreadCard = async ({
     role,
     orgName,
     orgImg,
-    orgId
-    // createdAtOrg,
+    orgId,
+    orgMembers
 } : Props) => 
     {
 

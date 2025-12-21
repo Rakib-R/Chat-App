@@ -37,7 +37,7 @@ export async function createCommunity({ id, name, username, image, description, 
     const user = await User.findOne({id : createdById})
     user.communities.push(community._id);
     await user.save();
-    console.log('%cCommunity Created AFTER push in Com Action' , 'font-size:14px; color:purple', community)
+    console.log('%cCommunity Created AFTER push in Com Action' , 'font-size:13px; color:purple', community)
 
     return createCommunity;
   } catch (error) {
@@ -51,7 +51,6 @@ export async function createCommunity({ id, name, username, image, description, 
 export async function fetchCommunityDetails(id: string) {
   try {
     connectTODB();
-
     const communityDetails = await Community.findOne({ id }).populate([
       "createdById",
       {
@@ -115,10 +114,7 @@ export async function fetchCommunities({
   try {
     connectTODB();
 
-    // Calculate the number of communities to skip based on the page number and page size.
     const skipAmount = (pageNumber - 1) * pageSize;
-
-    // Create a case-insensitive regular expression for the provided search string.
     const regex = new RegExp(searchString, "i");
 
     // Create an initial query object to filter communities.
@@ -142,7 +138,6 @@ export async function fetchCommunities({
       .limit(pageSize)
       .populate("members");
 
-    
     const totalCommunitiesCount = await Community.countDocuments(query);
 
     const communities = await communitiesQuery.exec();
