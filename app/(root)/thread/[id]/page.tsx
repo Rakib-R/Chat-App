@@ -16,8 +16,8 @@ const  Page = async ({params , searchParams} :Readonly< { params : Promise<{ id 
   const userInfo = await fetchUser(user.id);
   if (!userInfo?.onboarded) redirect('/onboarding')
 
-  const resolveParam = searchParams;
-  const orgName: string = resolveParam.q === undefined || "undefined" ? '' : String(resolveParam.q);
+  const resolveParam = await searchParams;
+  const orgName: string = await resolveParam.q === undefined || "undefined" ? '' : String(resolveParam.q);
   
   const post = await fetchThreadById(id)
   console.log('app=> root => thread Community' , post.community , post)
