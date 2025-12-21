@@ -101,10 +101,10 @@
 
 import React from 'react'
 
-const page = ({params}:any) => {
+const page = ({params , searchParams}:any) => {
   return (
     <div>page</div>
   )
 }
 
-export defaul{}t page
+export default page
