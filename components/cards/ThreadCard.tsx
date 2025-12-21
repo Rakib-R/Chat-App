@@ -36,7 +36,7 @@ interface Props {
     orgName?: string;
     orgImg?: string;
     role?: string | boolean;
-    orgMembers: OrganizationMembership[];
+    orgMembers?: OrganizationMembership[];
    
 }
 
