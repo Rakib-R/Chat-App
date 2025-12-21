@@ -7,7 +7,8 @@ interface Props {
   name: string;
   username: string;
   imgUrl: string;
-  bio:string
+  bio:string;
+  type?: 'User' | 'Community'; 
 
 }
 const ProfileHeader = ({
@@ -16,7 +17,8 @@ const ProfileHeader = ({
     name,
     username,
     bio,
-    imgUrl}
+    imgUrl,
+    type}
     : Props ) => 
       {
   return (

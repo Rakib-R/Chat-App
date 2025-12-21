@@ -4,7 +4,7 @@ export const connectTODB = async () => {
     try {
         const conn = await mongoose.connect(process.env.MONGODB_URI as string, {
             // Recommended options for modern Mongoose (no longer strictly necessary but good practice)
-            serverSelectionTimeoutMS: 5000, // Timeout after 5s for the initial connection handshake
+            serverSelectionTimeoutMS: 2000, // Timeout after 5s for the initial connection handshake
              // The default is 10000. Set low once connection is verified.
         });
 

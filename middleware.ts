@@ -8,6 +8,7 @@ const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)',
   '/sign-up(.*)',
   "/api/uploadthing",
+  "/api/webhooks/clerk"
 ])
 
 
@@ -43,9 +44,15 @@ export default clerkMiddleware(async (auth, req : NextRequest) => {
     return NextResponse.next()
   }
 
- 
-  // THIS LINE IS IMPLICITELY APPLIED
-  // return NextResponse.next();
+// 1. Create a new headers object based on the incoming request headers
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set('x-pathname', req.nextUrl.pathname);
+  
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    }
+  });
 
 })
 

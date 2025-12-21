@@ -7,54 +7,53 @@ import Thread from "../models/thread.model";
 import User from "../models/user.model";
 
 import { connectTODB } from "../mongoose";
+import path from "path";
 
-export async function createCommunity(
+interface params {
   id: string,
   name: string,
   username: string,
   image: string,
-  bio: string,
-  createdById: string // Change the parameter name to reflect it's an id
-) {
+  description: string,
+  createdById: string
+  
+}
+export async function createCommunity({ id, name, username, image, description, createdById }: params) {
   try {
     connectTODB();
+    const community = await Community.findOneAndUpdate(
+      { id: id },
+      {
+        id,
+        name,
+        username,
+        image,
+        description,
+        createdBy: createdById,
+      },
+      { upsert: true, new: true } 
+    );
 
-    // Find the user with the provided unique id
-    const user = await User.findOne({ id: createdById });
-
-    if (!user) {
-      throw new Error("User not found"); // Handle the case if the user with the id is not found
-    }
-
-    const newCommunity = new Community({
-      id,
-      name,
-      username,
-      image,
-      bio,
-      createdBy: user._id, // Use the mongoose ID of the user
-    });
-
-    const createdCommunity = await newCommunity.save();
-
-    // Update User model
-    user.communities.push(createdCommunity._id);
+    const user = await User.findOne({id : createdById})
+    user.communities.push(community._id);
     await user.save();
+    console.log('%cCommunity Created AFTER push in Com Action' , 'font-size:14px; color:purple', community)
 
-    return createdCommunity;
+    return createCommunity;
   } catch (error) {
-    // Handle any errors
+    
     console.error("Error creating community:", error);
     throw error;
   }
 }
+
 
 export async function fetchCommunityDetails(id: string) {
   try {
     connectTODB();
 
     const communityDetails = await Community.findOne({ id }).populate([
-      "createdBy",
+      "createdById",
       {
         path: "members",
         model: User,
@@ -64,7 +63,6 @@ export async function fetchCommunityDetails(id: string) {
 
     return communityDetails;
   } catch (error) {
-    // Handle any errors
     console.error("Error fetching community details:", error);
     throw error;
   }
@@ -89,7 +87,7 @@ export async function fetchCommunityPosts(id: string) {
           populate: {
             path: "author",
             model: User,
-            select: "image _id", // Select the "name" and "_id" fields from the "User" model
+            select: "image _id",
           },
         },
       ],
@@ -144,12 +142,12 @@ export async function fetchCommunities({
       .limit(pageSize)
       .populate("members");
 
-    // Count the total number of communities that match the search criteria (without pagination).
+    
     const totalCommunitiesCount = await Community.countDocuments(query);
 
     const communities = await communitiesQuery.exec();
 
-    // Check if there are more communities beyond the current page.
+ 
     const isNext = totalCommunitiesCount > skipAmount + communities.length;
 
     return { communities, isNext };

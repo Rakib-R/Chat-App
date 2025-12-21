@@ -1,5 +1,4 @@
 "use server"
-
 import { connectTODB } from "../mongoose";
 
 import User from "../models/user.model";
@@ -19,7 +18,7 @@ export async function createThread({ text, author, communityId, path }: Params
 ) {
   try {
     connectTODB();
-         // ALTERNATIVE AND PERFORMANCE ENHANCED CO-PILOT
+          // Alternative And Co-Pilot Approved waY
           // const communityIdObject = await Community.findById(communityId); 
     const communityIdObject = await Community.findOne(
       { id: communityId },
@@ -29,8 +28,8 @@ export async function createThread({ text, author, communityId, path }: Params
     const created_Thread = await Thread.create({
       text,
       author,
-      communityId: communityIdObject ? communityIdObject._id : null,
-      path
+      community: communityIdObject ? communityIdObject._id : null,
+      // path
     });
 
     await User.findByIdAndUpdate(author , {
@@ -42,7 +41,7 @@ export async function createThread({ text, author, communityId, path }: Params
         $push : {threads : created_Thread._id}
       })
     }
-      // have to do it
+    
     revalidatePath(path)
   }
   catch (error) {
@@ -52,8 +51,7 @@ export async function createThread({ text, author, communityId, path }: Params
 }
 
 
-
-export async function fetchPosts(pageNumber = 1 , pageSize = 20){
+export async function fetchPosts(pageNumber = 1 , pageSize = 6){
   connectTODB();
 
   const skipAmout = (pageNumber - 1 ) * pageSize;
@@ -70,14 +68,12 @@ export async function fetchPosts(pageNumber = 1 , pageSize = 20){
       select: '_id name parentId image'
     }
   })
-
   const totalPostsCount = await Thread.countDocuments({parentId:{$in: [null, undefined]}})
 
   const posts = await postQuery.exec()
   const isNext = totalPostsCount > skipAmout + posts.length;
   return {isNext, posts}
 }
-
 
 export async function fetchThreadById(id: string){
   connectTODB();
@@ -92,27 +88,28 @@ export async function fetchThreadById(id: string){
     .populate({
       path: 'children',
       populate :
-      [
+      // [
        { path: 'author',
         model:  User,
         select: "_id id name parentId image"
       },
-      {
-        path: 'children',
-        model: Thread,
-        populate: {
-          path: 'author',
-          model: User,
-          select: '_id id name parentId image'
-        }
-      }
-    ]
+      // I DONT THINK THIS RECURSION NECCESSARY
+      // { 
+      //   path: 'children',
+      //   model: Thread,
+      //   populate: {
+      //     path: 'author',
+      //     model: User,
+      //     select: '_id id name parentId image'
+      //   }
+      // }
+    // ]
     }).exec();
       return thread;
   }
 
   catch (error){
-      throw new Error('ERROR ERROR ERROR')
+      throw new Error('ERROR ERROR ERROR fetchThreadById')
   }
 }
 

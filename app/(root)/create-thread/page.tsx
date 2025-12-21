@@ -13,7 +13,6 @@ async function Page() {
   const userInfo = await fetchUser(user.id);
   if (!userInfo?.onboarded) redirect("/onboarding");
 
-  console.log('USERNAME ', user.username)
   return (
     <>
       <PostThread userId={String(userInfo._id)} />

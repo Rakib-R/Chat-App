@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation'
 import { fetchThreadById } from '@/lib/actions/thread.actions'
 import { Comment } from '@/components/forms/Comments'
 
-const  Page = async ({params} :Readonly< { params : Promise<{ id : string }>;
+const  Page = async ({params , searchParams} :Readonly< { params : Promise<{ id : string }>; searchParams : { q : string | string[] | undefined };
   }>) => {
 
   const user = await currentUser();
@@ -16,12 +16,16 @@ const  Page = async ({params} :Readonly< { params : Promise<{ id : string }>;
   const userInfo = await fetchUser(user.id);
   if (!userInfo?.onboarded) redirect('/onboarding')
 
+  const resolveParam = searchParams;
+  const orgName: string = resolveParam.q === undefined || "undefined" ? '' : String(resolveParam.q);
+  
   const post = await fetchThreadById(id)
+  console.log('app=> root => thread Community' , post.community , post)
 
   return (
     <section className='relative'> 
-      <ThreadCard key={post._id}
-          id={post._id}
+      <ThreadCard key={post._id.toString()}
+          id={post._id.toString()}
           currentUserId={user?.id}
           parentId={post.parentId}
           content={post.text}
@@ -30,6 +34,8 @@ const  Page = async ({params} :Readonly< { params : Promise<{ id : string }>;
           createdAt={post.createdAt}
           comments={post.children}
           isComment ={false}
+
+          orgName={orgName}
               />
               
       <div className='flex flex-col gap-4'>

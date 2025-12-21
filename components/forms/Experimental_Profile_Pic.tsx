@@ -138,16 +138,14 @@ const rejectStyle = {
         </div>
       ) : isDragActive ? (
         // Render this when the user is actively dragging a file
-        <div className="text-center p-4">
+        <div className="w-full h-full text-center p-4 bg-red-500">
           <p className="font-bold text-red-900">THIS IS NOT SHOWING</p>
         </div>
       ) : (
-        <div className="w-32 h-32 rounded-full text-center border-3 border-amber-300">
-              <div className='relative flex rounded-full justify-center items-center hover:backdrop-blur-lg w-full h-full'> 
-                <p className="absolute opacity-0 hover:opacity-100 font-bold text-red-900 ">Upload Your Photo</p>
-                <img className='hover:backdrop-blur-lg object-fill' src="/user_place.jpg" alt="" height={100} width={100} />
-                </div>
-                
+        <div className="w-32 h-32 rounded-full text-center border-3 border-amber-300
+              relative flex justify-center items-center hover:backdrop-blur-lg">
+                <img className='hover:backdrop-blur-lg object-cover' src="/user_avatar.png" alt="" height={100} width={100} />
+                <p className="absolute font-bold text-red-900 opacity-0 transition-opacity delay-100 hover:opacity-100">Upload Your Photo</p>
         </div> 
       )}
         </div>

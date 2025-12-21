@@ -22,34 +22,58 @@ export default function RootLayout({
   const localization = {
   signUp: {
     start: {
-      title: "Welcome Back Custom!",
+      title: "Please Proceed To Enter!",
       subtitle: 'to access {{applicationName}}',
     },
     emailCode: {
       subtitle: 'to access {{applicationName}}',
     },
   },
-
-   signIn: {
+  signIn : { 
+    start: {
+      // THIS CHANGES THE SUB-HEADER TEXT
+      subtitle: "Please enter your credensials", 
+      title: "Welcome Back!", 
+      actionText: "LETS GO!fdds", 
     },
-
-    formButtonPrimary: 'LETS GO!',
+  }
 }
 
   return (
     <ClerkProvider
 
     localization={localization}
-
     appearance={{
-      cssLayerName : 'clerk',
+      cssLayerName : 'clerk',  
+      layout : {
+      socialButtonsVariant : 'iconButton',
+      // headerSubtitle: "Glad to see you again!",
+      logoPlacement : 'inside',
+      socialButtonsPlacement : 'bottom'
+    },
+
       elements : {
-      //  footerAction: 'bg-black' ,
-      //  footer : 'bg-black',
-      // userButtonPopoverActionsuserButtonPopoverActions__singleSession : 'bg-black',
-          userButtonPopoverActions__singleSession : {
-          // backgroundColor : '#49247A'
-          },
+         footerAction: {
+          backgroundColor : 'black'
+         } 
+         ,
+        card : {
+         backgroundImage: `
+        radial-gradient(circle, white 190px, transparent 1px),             /* Sharp Center */
+        radial-gradient(circle, rgba(255,255,255,0.5) 10px, transparent 4px), /* Soft Glow */
+        repeating-linear-gradient(-130deg, #000, #000 5px, #111 5px, #111 50px) /* Background */
+`,
+        // Size 1: auto (for stripes) | Size 2: 20px (for dots)
+        backgroundSize: 'auto, 15px 15px',
+        backgroundPosition: 'center , 10px 90px',
+        },
+        formFieldRow: {
+          paddingTop: '1rem',
+          paddingDown: '2rem',
+        },
+      userButtonPopoverActions__singleSession : {
+      backgroundColor : '#49247A'
+      },
           userPreview : 'bg-black',
           userPreview__userButton : 'bg-black',
           userButtonAvatarBox : 'bg-black font-larger', 
@@ -62,11 +86,18 @@ export default function RootLayout({
     
     }}
     >
-      <html lang='en'>
-        <body className={`${inter.className} grid grid-flow-col w-screen h-screen justify-center items-center gap-6`}>
-          <p className="bg-red-400 text-white p-5 text-center
-">            THIS IS SIGN-OUT ( Auth ) PAGE
-          </p>    
+      <html lang='en' >
+        <body className={`${inter.className} grid grid-flow-col w-screen h-screen justify-center items-center gap-6`
+        } 
+        style={{backgroundImage : 
+          `  radial-gradient(circle, white 210px, transparent 1px), 
+            radial-gradient(circle, rgba(255,255,255,0.5) 10px, transparent 4px),
+            repeating-linear-gradient(-130deg, #000, #000 5px, #111 5px, #111 50px)   
+        ` ,
+        backgroundSize: 'auto, 15px 15px',  
+        backgroundPosition: '-140px -15px, 0 100px',
+        }}>
+        
         
       {children}
       

@@ -27,6 +27,7 @@ import { updateUser } from "@/lib/actions/user.actions";
 import { useUploadThing } from "@/lib/uploadthing";
 import Experimental from "./Experimental_Profile_Pic";
 
+
 interface Props {
   user: {
     id: string;
@@ -43,12 +44,13 @@ interface Props {
 export const AccountProfile = ({ user, btnTitle }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
-  const { startUpload } = useUploadThing("media");
-
+  
   const [files, setFiles] = useState<File[]>([]);
   const [error , setError] = useState('')
-
+  
+  const { startUpload } = useUploadThing("media");
   const form = useForm<z.infer<typeof UserValidation>>({
+    
     resolver: zodResolver(UserValidation),
     defaultValues: {
       profile_photo: user?.image ? user.image : "",
@@ -57,25 +59,23 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
       bio: user?.bio ? user.bio : "",
     },
   });
-
-
+  
   const onSubmit = async (values: z.infer<typeof UserValidation> ) => {
     try {
-
-      const blob = values.profile_photo;
-
-    const hasImageChanged = isBase64Image(blob);
-    if (hasImageChanged) {
-      // SURE Image files is not empty before calling startUpload
-    // if (files.length === 0) return;
       
-    const imgRes = await startUpload(files);
-      if (imgRes && imgRes[0].ufsUrl ) {
-        values.profile_photo = imgRes[0].ufsUrl ;
+      const blob = values.profile_photo;
+      
+      const hasImageChanged = isBase64Image(blob);
+      if (hasImageChanged) {
+      // Make SURE Image files is not empty before calling startUpload
+        if (files.length === 0) return;
+        
+        const imgRes = await startUpload(files);
+        if (imgRes && imgRes[0].ufsUrl ) {
+          values.profile_photo = imgRes[0].ufsUrl ;
+        }
       }
-    }
-    
-    // UPDATE FROM SERVER AFTER ONSUBMIT
+      // UPDATE OR CREATE USER IF-NOT EXISTS AFTER ON SUBMIT
     await updateUser({
       userId: user.id,
       name: values.name,
@@ -84,41 +84,40 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
       bio: values.bio,
       image: values.profile_photo,
     });
-
+    
     if (pathname === "/profile/edit") {
       router.back();
     } else {
       router.push("/");
     }
-    }
 
+  }
     catch(error: any) {
         console.log('Error Occured : ', error.code, error.message)
         setError(error.message)
     }
   };
 
-  // CURRENTLY UNUSED
-  const handleImage = (
-    e: ChangeEvent<HTMLInputElement>,
-    fieldChange: (value: string) => void
-  ) => {
-    e.preventDefault();
-    const fileReader = new FileReader();
+  // // CURRENTLY UNUSED
+  // const handleImage = (
+  //   e: ChangeEvent<HTMLInputElement>,
+  //   fieldChange: (value: string) => void
+  // ) => {
+  //   e.preventDefault();
+  //   const fileReader = new FileReader();
 
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      setFiles(Array.from(e.target.files));
+  //   if (e.target.files && e.target.files.length > 0) {
+  //     const file = e.target.files[0];
+  //     setFiles(Array.from(e.target.files));
 
-      if (!file.type.includes("image")) return;
-
-      fileReader.onload = async (event) => {
-        const imageDataUrl = event.target?.result?.toString() || "";
-        fieldChange(imageDataUrl);
-      };
-      fileReader.readAsDataURL(file);
-    }
-  };
+  //     if (!file.type.includes("image")) return;
+  //     fileReader.onload = async (event) => {
+  //       const imageDataUrl = event.target?.result?.toString() || "";
+  //       fieldChange(imageDataUrl);
+  //     };
+  //     fileReader.readAsDataURL(file);
+  //   }
+  // };
 
   return (
     <> 
@@ -136,10 +135,9 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
           control={form.control}
           name='profile_photo'
         render={({ field }) => (
-    <FormItem className=''>
-    
-    <Experimental /> 
-    </FormItem>
+          <FormItem className=''>
+            <Experimental /> 
+          </FormItem>
   )}
   />
   
