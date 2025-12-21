@@ -15,7 +15,7 @@ type PageProps = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-async function Page({ params } : PageProps) {
+async function Page({ params , searchParams} : PageProps) {
   const user = await currentUser();
   if (!user) return null;
 
