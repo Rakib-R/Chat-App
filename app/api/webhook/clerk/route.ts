@@ -12,22 +12,25 @@ import {
   removeUserFromCommunity,
   updateCommunityInfo,
 } from "@/lib/actions/community.actions";
+import { userInfo } from "os";
 
 // Resource: https://clerk.com/docs/integration/webhooks#supported-events
 // Above document lists the supported events
-type EventType =
-  | "organization.created"
-  | "organizationInvitation.created"
-  | "organizationMembership.created"
-  | "organizationMembership.deleted"
-  | "organization.updated"
-  | "organization.deleted";
+    type EventType =
+      | "organization.created"
+      | "organizationInvitation.created"
+      | "organizationMembership.created"
+      | "organizationMembership.deleted"
+      | "organization.updated"
+      | "organization.deleted";
 
-type Event = {
-  data: Record<string, string | number | Record<string, string>[]>;
-  object: "event";
-  type: EventType;
-};
+    type Event = {
+      data: Record<string, string | number | Record<string, string>[]>;
+      object: "event";
+      type: EventType;
+    };
+
+ 
 
 export const POST = async (request: Request) => {
   const payload = await request.json();
@@ -50,6 +53,7 @@ export const POST = async (request: Request) => {
       JSON.stringify(payload),
       heads as IncomingHttpHeaders & WebhookRequiredHeaders
     ) as Event;
+
   } catch (err) {
     return NextResponse.json({ message: err }, { status: 400 });
   }
@@ -60,20 +64,19 @@ export const POST = async (request: Request) => {
   if (eventType === "organization.created") {
     // Resource: https://clerk.com/docs/reference/backend-api/tag/Organizations#operation/CreateOrganization
     // Show what evnt?.data sends from above resource
-    const { id, name, slug, logo_url, image_url, created_by } =
+    const { id, name, slug, logo_url, image_url, created_by , username } =
       evnt?.data ?? {};
 
+     
     try {
-      // @ts-ignore
-      await createCommunity(
-        // @ts-ignore
-        id,
-        name,
-        slug,
-        logo_url || image_url,
-        "org bio",
-        created_by
-      );
+      await createCommunity({id: id as string,
+                name: name as string,
+                // slug: slug as string,
+                image: (logo_url || image_url) as string, // Added a key 'image'
+                description: "org bio",      
+                username : username as string,                     // Added a key 'bio'
+                createdById: created_by as string
+              } );
 
       return NextResponse.json({ message: "User created" }, { status: 201 });
     } catch (err) {
