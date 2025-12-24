@@ -14,6 +14,7 @@ import {
 } from "@/lib/actions/community.actions";
 import { userInfo } from "os";
 
+console.log('POSIX userInfo ', userInfo)
 // Resource: https://clerk.com/docs/integration/webhooks#supported-events
 // Above document lists the supported events
     type EventType =
