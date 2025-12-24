@@ -8,7 +8,8 @@ const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)',
   '/sign-up(.*)',
   "/api/uploadthing",
-  "/api/webhooks/clerk"
+  "/api/webhooks/clerk",
+  "/api/webhooks(.*)"
 ])
 
 
@@ -29,14 +30,15 @@ export default clerkMiddleware(async (auth, req : NextRequest) => {
    // If the user isn't signed in and the route is private, redirect to sign-in
   // if (!userId && !isPublicRoute(req)) return redirectToSignIn({ returnBackUrl: req.url })
 
-    // BUT CLERK DOESNT STORE SESSIONCLAIMS!! IT DOESNT WORK Check if the user is authenticated but NOT onboarded. 
-    const isNotOnboarded = userId && !sessionClaims?.metadata?.onboardingComplete;
+    // // BUT CLERK DOESNT STORE SESSIONCLAIMS!! IT DOESNT WORK Check if the user is authenticated but NOT onboarded. 
+    // const isNotOnboarded = userId && !sessionClaims?.unsafeMetadata?.onboardingComplete;
+  
 
-    // A. If user is NOT onboarded AND NOT trying to reach /onboarding, REDIRECT them to /onboarding.
-    if (isNotOnboarded && !isOnboardingRoute(req)) {
-        const onboardingUrl = new URL('/onboarding', req.url);
-        return NextResponse.redirect(onboardingUrl);
-    }
+    // // A. If user is NOT onboarded AND NOT trying to reach /onboarding, REDIRECT them to /onboarding.
+    // if (isNotOnboarded && !isOnboardingRoute(req)) {
+    //     const onboardingUrl = new URL('/onboarding', req.url);
+    //     return NextResponse.redirect(onboardingUrl);
+    // }
 
   // THIS IS CLERK DOCUMENTION
   // For users visiting /onboarding, don't try to redirect
@@ -62,7 +64,10 @@ export const config = {
     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
     // Always run for API routes
     '/(api|trpc)(.*)',
-    // Web-Hooks
+    // Web-Hooks (Original)
     '/((?!.*\\..*|_next).*)', '/',
+    
+    // Web-Hooks (CHATGPT --- FIX ---)
+    //  '/((?!api/webhooks/clerk).*)',
   ],
 }

@@ -18,7 +18,7 @@ type props = {
   
 }
     
-export const Experimental: FC<props>= ({}) : ReactElement => {
+export const Experimental_Profile_Pic: FC<props>= ({}) : ReactElement => {
   const [files, setFiles] = useState<File | null>();
      const onDrop = useCallback((acceptedFiles: File[]) => {
         
@@ -164,4 +164,4 @@ export const Experimental: FC<props>= ({}) : ReactElement => {
   )
 }
 
-export default Experimental
+export default Experimental_Profile_Pic

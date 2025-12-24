@@ -1,4 +1,4 @@
-// It's a good practice to verify webhooks. Above article shows why we should do it
+
 import { Webhook, WebhookRequiredHeaders } from "svix";
 import { headers } from "next/headers";
 
@@ -45,7 +45,7 @@ export const POST = async (request: Request) => {
 
   // Activitate Webhook in the Clerk Dashboard.
   // After adding the endpoint, you'll see the secret on the right side.
-  const wh = new Webhook(process.env.NEXT_CLERK_WEBHOOK_SECRET || "");
+  const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET || "");
 
   let evnt: Event | null = null;
 

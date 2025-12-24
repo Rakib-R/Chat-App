@@ -25,7 +25,7 @@ import { updateUser } from "@/lib/actions/user.actions";
 
 // UPLOADTHING
 import { useUploadThing } from "@/lib/uploadthing";
-import Experimental from "./Experimental_Profile_Pic";
+import Experimental_Profile_Pic from "./Experimental_Profile_Pic";
 
 
 interface Props {
@@ -130,9 +130,20 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
           {error}
         </div>
 
-        EXPERIMENTAL UPLOAD
-  
-            <Experimental /> 
+   <FormField
+          control={form.control}
+          name='profile_photo'
+          render={({ field }) => (
+            <FormItem className=''>  
+              <FormControl>
+
+            <Experimental_Profile_Pic /> 
+
+              </FormControl>     
+                <FormMessage className='text-red-500' />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
