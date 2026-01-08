@@ -1,56 +1,64 @@
 "use server";
 
-import { FilterQuery, SortOrder } from "mongoose";
-
+import mongoose, { FilterQuery, SortOrder } from "mongoose";
+import { unstable_cache } from 'next/cache';
 import Community from "../models/community.model";
 import Thread from "../models/thread.model";
 import User from "../models/user.model";
 
 import { connectTODB } from "../mongoose";
-import path from "path";
 
 interface params {
   id: string,
   name: string,
-  username: string,
   image: string,
   description: string,
-  createdById: string
+  createdById: string,
+  members : [string]
   
 }
-export async function createCommunity({ id, name, username, image, description, createdById }: params) {
-  try {
-    connectTODB();
-    const community = await Community.findOneAndUpdate(
-      { id: id },
-      {
-        id,
-        name,
-        username,
-        image,
-        description,
-        createdBy: createdById,
-      },
-      { upsert: true, new: true } 
-    );
 
-    const user = await User.findOne({id : createdById})
-    user.communities.push(community._id);
-    await user.save();
-    console.log('%cCommunity Created AFTER push in Com Action' , 'font-size:13px; color:purple', community)
+export const createCommunity = unstable_cache(
+  async ({ id, name, image, description, createdById, members }: params) => {
+    try {
+      await connectTODB();
 
-    return createCommunity;
-  } catch (error) {
-    
-    console.error("Error creating community:", error);
-    throw error;
-  }
-}
+      // Use .lean() here because we only need the ID and a POJO for the cache
+      const community = await Community.findOneAndUpdate(
+        { id: id },
+        { id, name, image, description, createdById: createdById , 
+          $addToSet: { members: createdById }
+        },
+        { upsert: true, new: true }
+      );
 
+      const communityId = community._id.toString();
+
+      // Use .lean() for the user lookup to save memory/time
+      const user = await User.findOne({ id: createdById });
+
+      if (user) {
+        await User.findByIdAndUpdate(
+          user._id, // Pass the ID, not the whole object
+          { $addToSet: { communities: communityId } },
+          { new: true }
+        );
+      }
+
+      // Return the plain object result, which is cache-friendly
+      return community; 
+    } catch (error) {
+      console.error("Error creating community:", error);
+      throw error;
+    }
+  },
+  ['community-details'],
+  { revalidate: 60 }
+);
 
 export async function fetchCommunityDetails(id: string) {
   try {
-    connectTODB();
+  await connectTODB();
     const communityDetails = await Community.findOne({ id }).populate([
       "createdById",
       {
@@ -112,7 +120,7 @@ export async function fetchCommunities({
   sortBy?: SortOrder;
 }) {
   try {
-    connectTODB();
+   await connectTODB();
 
     const skipAmount = (pageNumber - 1) * pageSize;
     const regex = new RegExp(searchString, "i");
@@ -141,8 +149,6 @@ export async function fetchCommunities({
     const totalCommunitiesCount = await Community.countDocuments(query);
 
     const communities = await communitiesQuery.exec();
-
- 
     const isNext = totalCommunitiesCount > skipAmount + communities.length;
 
     return { communities, isNext };
@@ -159,34 +165,24 @@ export async function addMemberToCommunity(
   try {
     connectTODB();
 
+    const Commu_ = await Community.findOne({id : communityId})
+    const User_ = await User.findOne ({id : memberId})
+
+
     // Find the community by its unique id
-    const community = await Community.findOne({ id: communityId });
+   const updatedCommunity = await Community.findOneAndUpdate(
+      { id: communityId },
+      { $addToSet: { members: User_._id } }, // Only adds if userId is NOT present
+      { new: true }
+    );
 
-    if (!community) {
-      throw new Error("Community not found");
-    }
+   if (!updatedCommunity) throw new Error("Community not found");
+   
+    User_.communities.push(Commu_._id);
+    await User_.save();
 
-    // Find the user by their unique id
-    const user = await User.findOne({ id: memberId });
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    // Check if the user is already a member of the community
-    if (community.members.includes(user._id)) {
-      throw new Error("User is already a member of the community");
-    }
-
-    // Add the user's _id to the members array in the community
-    community.members.push(user._id);
-    await community.save();
-
-    // Add the community's _id to the communities array in the user
-    user.communities.push(community._id);
-    await user.save();
-
-    return community;
+    return updatedCommunity;
+    
   } catch (error) {
     // Handle any errors
     console.error("Error adding member to community:", error);
@@ -275,9 +271,6 @@ export async function deleteCommunity(communityId: string) {
       throw new Error("Community not found");
     }
 
-    // Delete all threads associated with the community
-    await Thread.deleteMany({ community: communityId });
-
     // Find all users who are part of the community
     const communityUsers = await User.find({ communities: communityId });
 
@@ -286,12 +279,57 @@ export async function deleteCommunity(communityId: string) {
       user.communities.pull(communityId);
       return user.save();
     });
-
     await Promise.all(updateUserPromises);
+
+    // Remove Thread's ASSOCIATION with COMMUNITY
+     await Thread.updateOne(
+      { communities: communityId }, 
+      { $unset: { communities: "" } } // This removes the field entirely
+      // { communities: null }        // This keeps the field but sets it to null
+);
 
     return deletedCommunity;
   } catch (error) {
     console.error("Error deleting community: ", error);
+    throw error;
+  }
+}
+
+// SPECIAL COMMUNITY CROSS CHECK WITH THREAD
+// In your community.actions.ts
+
+export async function _findCommunityByThreadAuthor(threadId: string) {
+  try {
+    connectTODB();
+    
+    // 1. Find the thread and get its author
+    const thread = await Thread.findById(threadId).populate({
+      path: "author",
+      model: User,
+      select: "id _id"
+    })
+    ;
+    
+    if (!thread) {
+      throw new Error("Thread not found");
+    }
+    console.log('📝 Thread author:', thread.author);
+    
+    // 2. Find the community where this user is the admin (createdBy)
+    const community = await Community.findOne({ 
+      createdBy: thread.author._id  // Match the createdBy field with author's _id
+    });
+    
+    if (!community) {
+      console.log('❌ No community found where this user is admin');
+      return null;
+    }
+    console.log('🏘️ Found community:', community.name, community.id);
+    
+    return community;
+    
+  } catch (error) {
+    console.error("Error finding community by thread author:", error);
     throw error;
   }
 }

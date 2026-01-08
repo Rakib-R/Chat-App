@@ -4,25 +4,23 @@ import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { fetchUser } from "@/lib/actions/user.actions";
 import ProfileHeader from "@/components/shared/ProfileHeader";
-import {Tabs , TabsContent, TabsTrigger, TabsList} from "@/components/ui/tabs"
+import {Tabs, TabsContent, TabsTrigger, TabsList} from "@/components/ui/tabs"
 import { profileTabs } from "@/constants";
 import Image from "next/image";
 import ThreadsTab from "@/components/shared/ThreadsTab";
 
-async function Page({params} :Readonly <{params :Promise <{id : string}>}>
+async function Page({params} :Readonly <{params:Promise <{id : string}>}>
 
 ) {
   const user = await currentUser();
-  // const {id}  = await params;
+  const {id}  = await params;
   if (!user) return null;
 
   const userInfo = await fetchUser(user.id);
-  console.log("User at Profile", userInfo)
-
   if (!userInfo?.onboarded) redirect("/onboarding");
 
   return (
-    <section className="flex flex-col gap-8">
+    <section className="flex flex-col gap-8 w-1/3 mt-8">
       <ProfileHeader 
         accountId={userInfo.id}
         authUserId={user.id}
@@ -31,15 +29,14 @@ async function Page({params} :Readonly <{params :Promise <{id : string}>}>
         imgUrl={userInfo.image}
         bio={userInfo.bio}
   />
-
       <div className="mt-9 ">
           <Tabs defaultValue="threads" className='w-full'>
               <TabsList className="tab w-full">
-                    {profileTabs.map((tab) =>( 
-                      <TabsTrigger key={tab.label} value={tab.value} className="tab">
-                            <Image src={tab.icon} alt= {tab.label}width={24} height={24} className="object-contain"
-                            />
-                      {tab.label === 'Threads' && (<p className="ml-1 rounded-sm bg-light-4 px-2 py-1">
+                {profileTabs.map((tab) =>( 
+                  <TabsTrigger key={tab.label} value={tab.value} className="tab">
+                        <Image src={tab.icon} alt= {tab.label}width={24} height={24} className="object-contain"
+                        />
+                      {tab.label === 'Threads' && (<p className="ml-1 rounded-sm bg-red-200 px-6 py-1">
                         {userInfo?.threads?.length} </p>
                         )}
                       </TabsTrigger> 
@@ -47,7 +44,7 @@ async function Page({params} :Readonly <{params :Promise <{id : string}>}>
               </TabsList>
 
            {profileTabs.map((tab) => (
-            <TabsContent key={`content-${tab.label}`} value={tab.value} className="w-full text-light-1"> 
+            <TabsContent key={`content-${tab.label}`} value={tab.value} className="w-full"> 
                  <ThreadsTab currentUserId={user.id} accountId={userInfo.id} accountType='User'
                  />
             </TabsContent>

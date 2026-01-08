@@ -15,8 +15,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ThreadValidation } from "@/lib/validations/thread";
 import { createThread } from "@/lib/actions/thread.actions";
+import { getCurrentOrg } from "@/app/organization";
+import { useEffect, useState } from "react";
 
-import { useOrganization } from "@clerk/nextjs";
 
 interface Props {
   userId: string;
@@ -25,7 +26,45 @@ interface Props {
 export function PostThread({userId}: Props) {   
   const router = useRouter();
   const pathname = usePathname();
-  const { organization } = useOrganization(); 
+
+  interface OrgData {
+  id: string;
+  name: string;
+  img: string;
+}
+
+  interface OrgData {
+  id: string;
+  name: string;
+  img: string;
+}
+
+const [orgData, setOrgData] = useState<OrgData | null>(null);
+const [loading, setLoading] = useState(true);
+
+useEffect(() => {
+  async function fetchData() {
+    const orgs = await getCurrentOrg();
+
+    if (!orgs) {
+      setLoading(false);
+      return;
+    }
+
+    const { orgId, orgImg, orgName } = orgs;
+
+    setOrgData({
+      id: orgId,
+      name: orgName,
+      img: orgImg,
+    });
+
+    setLoading(false);
+  }
+
+  fetchData();
+}, []);
+
 
   const form = useForm<z.infer<typeof ThreadValidation>>({
     resolver: zodResolver(ThreadValidation),
@@ -35,17 +74,15 @@ export function PostThread({userId}: Props) {
     },
   });
   
-  const onSubmit = async (values: z.infer<typeof ThreadValidation>) => {
 
+  const onSubmit = async (values: z.infer<typeof ThreadValidation>) => {
       await createThread({
       text: values.thread,
       author: userId,
-      communityId: organization ? organization.id : null,
+      communityId: orgData ? orgData.id : null,
       path: pathname,
     });
 
-    
-    
     router.push("/");
   };
 
@@ -60,7 +97,7 @@ export function PostThread({userId}: Props) {
           render={({ field }) => (
             <FormItem>
               <FormLabel className="my-8 text-xl">Content</FormLabel>
-              <FormControl className="no-focus border-dark-4 bg-dark-3 text-light-1">
+              <FormControl className=" border-gray-400 border-1 text-gray-900 font-mono">
                 <Textarea rows={15} cols={73} placeholder='What do you want to talk about?' {...field} />
               </FormControl>
               <FormMessage />

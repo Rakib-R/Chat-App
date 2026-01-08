@@ -1,167 +1,128 @@
-"use client"
+"use client";
 
-import React, { useMemo,CSSProperties, useEffect, ReactElement, FC } from 'react'
-import { useState, useCallback } from 'react';
-
-// DROP ZONE
-// import { UploadDropzone } from "@uploadthing/react";
+import React, { useMemo, useState, useCallback, useEffect, FC } from 'react';
 import { useDropzone } from "@uploadthing/react";
 import { useUploadThing } from "@/lib/uploadthing";
-
 import {
   generateClientDropzoneAccept,
   generatePermittedFileTypes,
 } from "uploadthing/client";
+import Image from 'next/image';
 
+interface props {
+ setFiles: (files: File[]) => void;
+  onChange : (value : string)  => void;
+  initialImage : string;
 
-type props = {
-  
 }
-    
-export const Experimental_Profile_Pic: FC<props>= ({}) : ReactElement => {
-  const [files, setFiles] = useState<File | null>();
-     const onDrop = useCallback((acceptedFiles: File[]) => {
-        
-      const file = acceptedFiles[0];
-      if (file) {
-      setFiles(file);
 
-        }
-      }, []);
-      
-      
-      const { startUpload, routeConfig, isUploading } = useUploadThing("media", {
-        onClientUploadComplete: () => {
-          alert("uploaded successfully!");
-        },
-        onUploadError: () => {
-          alert("error occurred while uploading");
-        },
-        onUploadBegin: (file) => {
-          console.log("upload has begun for", file);
-        },
-      });
-    
-        const { getRootProps, getInputProps } = useDropzone({
-        onDrop,
-        accept: generateClientDropzoneAccept(
-          generatePermittedFileTypes(routeConfig).fileTypes,
-        ),
+export const Experimental_Profile_Pic: FC<props> = ({ setFiles, onChange, initialImage }) => {
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-      });
-
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-      useEffect(() => {
-      if (files) {
-
-        const url = URL.createObjectURL(files);
-        setPreviewUrl(url);
-        return () => URL.revokeObjectURL(url);
-      } 
-    }, [files]);
-
-      const handleUpload = async () => {
-          if (files) {
-            // startUpload expects an array of File objects
-            await startUpload([files]);
-            // Optional: Clear the preview after successful upload
-            // setFileToUpload(null); 
-    }
-  };
-
-    const baseStyle: CSSProperties = {
-      flex: 1,
-      display: 'flex', flexDirection: 'column',alignItems: 'center',padding: '10px',borderWidth: 2,
-    borderColor: 'grey',  borderStyle: 'dashed',outline: 'none',transition: 'border .24s ease-in-out',
-
-    };
-
-    const focusedStyle = {
-      borderColor: 'blue',
-      color: 'red',
-      fontWeight: 'bold'
-    }; const acceptStyle = {
-      borderColor: 'red'
-    };
-    const rejectStyle = {
-      borderColor: 'red'
-    };
-
-  const {
-    isDragActive,
-    isDragAccept,
-    isDragReject,
-    isFocused,
-  } = useDropzone({
-    onDrop,
-    accept: { 'image/*': [] }
+  // 1. UPLOADTHING HOOK
+  const { startUpload, routeConfig, isUploading } = useUploadThing("media", {
+    onClientUploadComplete: (res) => {
+      const uploadedUrl = res?.[0]?.ufsUrl;
+      if (uploadedUrl) {
+        setPreviewUrl(uploadedUrl);
+        setFile(null); // Clear selected file after success
+        alert("Upload Complete!");
+      }
+    },
+    onUploadError: (error) => {
+      alert(`Upload failed: ${error.message}`);
+    },
   });
 
+  // 2. DROPZONE HANDLER
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const selectedFile = acceptedFiles[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      // Create local preview
 
-  const style: CSSProperties = useMemo(() => ({
-    ...baseStyle,
-    ...(isFocused ? focusedStyle : {}),
-    ...(isDragAccept ? acceptStyle : {}),
-    ...(isDragReject ? rejectStyle : {})
-  }), [isFocused, isDragAccept, isDragReject]);
+      // HAS-IMAGE CHANGED FUNCTION FROM ACCOUNT PROFILE
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target?.result as string;
+        setPreviewUrl(base64); // Local preview
+        onChange(base64);      // Tell React Hook Form the value changed
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+  }, []);
 
+  const { getRootProps, getInputProps, isDragActive, isFocused } = useDropzone({
+    onDrop,
+    accept: routeConfig 
+      ? generateClientDropzoneAccept(generatePermittedFileTypes(routeConfig).fileTypes)
+      : undefined,
+    multiple: false,
+  });
+
+  // Clean up object URLs to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (previewUrl?.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+
+  // 3. STYLING LOGIC
+  const containerStyle = useMemo(() => {
+    return `
+      relative w-24 h-24 rounded-full border-2 transition-all duration-200 cursor-pointer
+      flex items-center justify-center overflow-hidden group
+      ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-dashed border-gray-300 hover:border-blue-400'}
+      ${isFocused ? 'ring-2 ring-blue-200 border-blue-500' : ''}
+    `;
+  }, [isDragActive, isFocused]);
 
   return (
-    <div>
-        {/* ADDED UPLOADTHING EXPERIMENT */}
+    <div className="flex flex-col items-center gap-4">
+      {/* Dropzone Container */}
+      <div {...getRootProps()} className={containerStyle}>
+        <input {...getInputProps()} />
 
-    <div {...getRootProps()}  className='h-32' >
-          <input {...getInputProps()} />
-      
-    <div style={isFocused ? {backgroundColor: 'red', color : 'red' , padding : '39px', margin:'55px'} : {color : ''}} >
-        {isDragAccept ?  ( <div className='w-16 h-16' >DRAGIIHNG  </div>) : ( null) }  
-        {isFocused ? (<div className='w-16 h-16' style={{ border: '21px solid blue' }}>This IS PURE STYLE </div> ) : (null)}
+        {previewUrl ? (
+          <div className="relative w-full h-full">
+            <Image
+              src={previewUrl}
+              alt="Preview"
+              width={50}
+              height={50}
+              className="w-full h-full object-cover p-4"
+              priority
+            />
+            {/* Hover Overlay */}
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <p className="text-white text-xs font-medium">Change Photo</p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center text-gray-400">
+             {/* Default Avatar State */}
+             <div className="text-2xl mb-1">＋</div>
+             <p className="text-[10px] uppercase font-bold">Photo</p>
+          </div>
+        )}
 
-  {files ? (
-        <div className="w-32 h-32 rounded-full  text-center">
-          {previewUrl && (
-            <div className='relative flex rounded-full justify-center items-center w-full h-full'> 
-              <img 
-                  src={previewUrl} 
-                  height={100}
-                  width={100}
-                  className="w-full h-full         
-                    object-fit
-                      rounded-full 
-                      shadow-md"
-              />
-               </div>
-      )}
-        </div>
-      ) : isDragActive ? (
-        // Render this when the user is actively dragging a file
-        <div className="w-full h-full text-center p-4 bg-red-500">
-          <p className="font-bold text-red-900">THIS IS NOT SHOWING</p>
-        </div>
-      ) : (
-        <div className="w-32 h-32 rounded-full text-center border-3 border-amber-300
-              relative flex justify-center items-center hover:backdrop-blur-lg">
-                <img className='hover:backdrop-blur-lg object-cover' src="/user_avatar.png" alt="" height={100} width={100} />
-                <p className="absolute font-bold text-red-900 opacity-0 transition-opacity delay-100 hover:opacity-100">Upload Your Photo</p>
-        </div> 
-      )}
-        </div>
+        {/* Uploading Spinner Overlay */}
+        {isUploading && (
+          <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-10">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+          </div>
+        )}
       </div>
-      {files && (
-        <button
-          onClick={handleUpload}
-          disabled={isUploading}
-          className={`mt-4 px-4 py-2 font-bold rounded ${
-            isUploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-700 text-white'
-          }`}
-        >
-          {isUploading ? 'Uploading...' : 'Click to Upload Photo'}
-        </button>
+
+      {isDragActive && (
+        <p className="text-blue-500 text-sm animate-pulse">Drop to update photo</p>
       )}
     </div>
+  );
+};
 
-  )
-}
-
-export default Experimental_Profile_Pic
+export default Experimental_Profile_Pic;

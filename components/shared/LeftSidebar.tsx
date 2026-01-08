@@ -25,12 +25,33 @@ const LeftSidebar = () => {
 
   return (
     <section className='custom-scrollbar'>
-      <div className=' flex h-9/10  flex-col gap-8 px-8 bg-gray-600 text-xl text-white font-sans'>
+      <div className='flex flex-col py-8 gap-8 px-8 bg-gray-600 text-xl text-white font-sans'>
+        
+      <Link 
+          className="relative flex items-center px-2 py-2 gap-4 hover:bg-slate-900/10 rounded-lg group transition-all"
+          href={`/profile/${user?.id}`}
+        >
+          {/* Animated Background Layer */}
+          <div className="absolute bg-red-600 inset-0 -z-10 opacity-0 scale-95 blur-sm 
+                          group-hover:opacity-50 group-hover:scale-105 group-hover:blur-none 
+                          transition-all duration-300 ease-out rounded-lg pointer-events-none" />
+              <img 
+                className='rounded-xl relative z-10 transition-transform group-hover:scale-110' 
+                src={user?.imageUrl} 
+                alt="" 
+                width={33} 
+                height={33} 
+              />
+          
+          <span className="relative z-10 text-white font-medium">
+            {user?.fullName}
+          </span>
+        </Link>
         {sidebarLinks.map((link) => {
           
           let routePath = link.route; 
 
-          // 3. --- Dynamic Route Adjustment (MUST happen BEFORE isActive check) ---
+          // --- Dynamic Route Adjustment (MUST happen BEFORE isActive check) ---
           if (link.route === "/profile" && userId) {
             routePath = `${link.route}/${userId}`;
           } else if (link.route === "/profile" && !userId) {
@@ -38,20 +59,19 @@ const LeftSidebar = () => {
               routePath = '/sign-in'; 
           }
 
-          // 4. --- Correct Active Check Logic ---
+          // --- Correct Active Check Logic ---
           // pathName.includes(link.route) is often too broad.
-          // Use startsWith for better nested route matching (e.g., /settings/account is active for /settings).
           const isActive = 
             (routePath === '/' && pathName === '/') ||
             (routePath !== '/' && pathName.startsWith(routePath));
           
-          // 5. --- Corrected CSS Class Syntax ---
+
           return (
             <Link
               href={routePath}
               key={link.label}
               // The class structure must be: `static_classes ${conditional_classes}`
-              className={`leftsidebar_link ${isActive ? "no-underline bg-purple-500 rounded" : ""}`}
+              className={`leftsidebar_link ${isActive ? " no-underline bg-blue-900/80 rounded-xl" : ""}`}
             >
               <div className="flex gap-5 p-3 ">
                 <div className="">
@@ -71,7 +91,7 @@ const LeftSidebar = () => {
       </div>
 
       {/* 6. --- Use SignedIn to show/hide Clerk components --- */}
-      <div className='mt-10'>
+      <div className='mt-4'>
           <SignedIn>
             <SignOutButton signOutOptions={{redirectUrl: '/'}}>
               <div className='flex p-3 gap-5 cursor-pointer bg-slate-400'>

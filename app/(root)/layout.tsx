@@ -7,22 +7,24 @@ import {
   OrganizationProfile,
   
 } from '@clerk/nextjs'
-import { currentUser } from '@clerk/nextjs/server';
 import { dark, neobrutalism, shadesOfPurple } from '@clerk/themes'
 import LeftSidebar from "@/components/shared/LeftSidebar";
-import Bottombar from "@/components/shared/Bottombar";
 import RightSidebar from "@/components/shared/RightSidebar";
 import Topbar from "@/components/shared/Topbar";
 
 import type { Appearance } from '@clerk/types';
 
-// import { Geist, Geist_Mono, Neonderthaw } from 'next/font/google'
+import { Geist, Geist_Mono, Neonderthaw } from 'next/font/google'
 import { Roboto } from 'next/font/google';
 import '../globals.css'
+import { currentUser } from '@clerk/nextjs/server';
+import { UploadErrorBoundary } from '@/components/Error-Boundary';
 
+const geist = Geist({
+  variable : '--font-geist'
+})
 const roboto = Roboto({
-  weight: ['100', '300', '400', '500', '700', '900'], // Specify all weights you plan to use
-  subsets: ['latin'],
+  weight: ['100', '300', '400', '500', '700', '900'],
   display: 'swap', // This is recommended for performance
   
   variable: '--font-roboto', 
@@ -39,39 +41,43 @@ export default async function  RootLayout ({
   children: React.ReactNode
 }>) {
 
-  
+  // console.log('CLERK User at app > root > layout' , user)
   // CLERK APPEARACNES 
 
+  const user = await currentUser();
+  const isFirstTime = !!user?.publicMetadata?.isFirstTimeUser;
+  
   const userButtonAppearance = {
     elements: {
-      userButtonAvatarBox: "w-10 h-10", // Custom width and height
-      userButtonPopoverCard: "bg-gray-700", // Custom background for the popover card
+      userButtonAvatarBox: "w-64", // Custom width and height
+      userButtonPopoverCard: "w-64", // Custom background for the popover card
+      userButtonPopoverMain : '',
       userButtonPopoverActionButton: "text-red-600", // Custom text color for action buttons
-      userButtonPopoverActionButton__signOut : ''
+      userButtonPopoverActionButton__signOut : '',
+      userButtonPopoverRootBox : 'bg-red w-128'
+      ,rootBox: "w-128",                // The outermost wrapper
+      userButtonTrigger: "...",      // The clickable avatar button
+      userButtonAvatarImage: "...",  // The actual <img> tag
+      userButtonPopoverActionButton__addAccount: "text-purple-500 hover:bg-purple-50",
+      // Styles the "Sign out of all accounts" button
+      userButtonPopoverActionButton__signOutAll: "text-red-500 border-t border-gray-100",
     },
   };
-
-  
-    const customAppearance = {
+  const customAppearance = {
    
-      // theme: shadesOfPurple ,
-      cssLayerName :  'clerk',
+     cssLayerName :  'clerk',
+    // theme: shadesOfPurple ,
       variables: {
-        colorPrimary: 'white',
-        colorTextSecondary : 'white',
-
+        colorPrimary: 'green',
+        colorTextSecondary : 'violet',
         colorBackground: '', // Deep, charcoal background
-        colorForeground: 'red',
+        colorForeground: 'purple',
         colorText: 'green', // Light, distinct text
-
         fontFamily: 'var(--font-roboto)', 
-        
       },
       
-  // 3. Layout: Change structural elements
+
   layout: {
-    // Replace the default logo with your own
-    logoImageUrl: 'https://your-domain.com/path-to-your-logo.svg',
     // Place social buttons at the bottom
     socialButtonsPlacement: 'bottom',
     // Change the placement of the logo to outside the card (for a cleaner look)
@@ -80,36 +86,25 @@ export default async function  RootLayout ({
 
   elements: {
         card: {
-          backgroundColor: "black", // CSS Object style
+          backgroundColor: "black", //ORGANIZATIN ADD BUTTON BACKGROUUND
           border: "1px solid rgba(255,255,255,0.1)"
         },
         formButtonPrimary: {
-        className: "!bg-indigo-600 hover:!bg-indigo-700 !transition-all !duration-300 !rounded-lg !py-3 !text-lg !font-bold !uppercase"
+        className: "!bg-indigo-600 hover:!bg-indigo-700 !transition-all duration-300 rounded-lg !py-3 text-lg !font-bold !uppercase"
       },
-      // This is likely the one failing. Add !shadow-none to remove the default Clerk inner shadow
-      formFieldInput: {
-        // className: "!bg-red-500 !border-gray-600 !text-white !rounded-md focus:!ring-blue-500 focus:!border-blue-500 !shadow-none"
-        backgroundColor : 'red',
-        margin : '50px !important', 
-      },
-      footerActionText: {
-        className: "!text-indigo-400 hover:!text-indigo-300 !font-medium"
-      },
-      // Hiding the footer
-      footer: {
-        display: "none !important"
-      },
+
       }
   } as Appearance
 
 
   return (
+    <UploadErrorBoundary>
     <ClerkProvider
      appearance= {customAppearance}
      >
-      <html lang="en" className={`h-screen ${roboto.className}`} >
-        <body className={` ${roboto.variable} antialiased mx-8 h-[100vh] flex flex-col gap-0 justify-between text-white`} >
-          <nav className="flex px-8 justify-between bg-gray-800 text-white">
+      <html lang="en" className={`h-screen ${geist.className} ${roboto.className}`} >
+        <body className={`antialiased mx-8 h-[100vh] flex flex-col gap-0 justify-between text-gray-900`} >
+          <nav className="flex px-8 justify-between bg-gray-700 text-white">
             <Topbar/>
             <p className='font-black self-center'>THIS IS INSIDE IN THE ROOT LAYOUT and TOPBAR</p>
             
@@ -123,15 +118,16 @@ export default async function  RootLayout ({
             </SignedIn>
           </nav>
 
-        <div className='flex justify-between h-[90vh]'>
+        <div className='flex justify-between'>
           <LeftSidebar />
-          {children}
           
-          <RightSidebar />
+          {children}
+
+        <RightSidebar isFirstTime={isFirstTime} />
         </div>
-          <Bottombar />
         </body>
       </html>
     </ClerkProvider>
+  </UploadErrorBoundary>
   )
 }

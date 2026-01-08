@@ -17,7 +17,7 @@ const UserCard = ({id , name, username, imgUrl, personType} : Props) => {
   const router = useRouter()
 
     return (
-    <div className='flex justify-between w-full bg-amber-300'>
+    <div className='flex justify-between w-full'>
         <div className='user-card_avatar'>
             <Image 
                   src={imgUrl}

@@ -32,11 +32,11 @@ function Pagination({ pageNumber, isNext, path }: Props) {
   if (!isNext && pageNumber === 1) return null;
 
   return (
-    <div className='pagination'>
+    <div className='pagination flex justify-center gap-8 '>
       <Button
         onClick={() => handleNavigation("prev")}
         disabled={pageNumber === 1}
-        className='!text-small-regular text-light-2'
+        className='!text-small-regular p-4 w-16 hover:cursor-pointer'
       >
         Prev
       </Button>
@@ -44,7 +44,7 @@ function Pagination({ pageNumber, isNext, path }: Props) {
       <Button
         onClick={() => handleNavigation("next")}
         disabled={!isNext}
-        className='!text-small-regular text-light-2'
+        className='!text-small-regular p-4 w-16 hover:cursor-pointer'
       >
         Next
       </Button>

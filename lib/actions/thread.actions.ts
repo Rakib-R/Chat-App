@@ -14,13 +14,14 @@ interface Params {
   path: string,
 }
 
+// DELETE EXTRA THREAD IN CLEANUP.ACTIONS
 export async function createThread({ text, author, communityId, path }: Params
 ) {
   try {
-    connectTODB();
+   await connectTODB();
           // Alternative And Co-Pilot Approved waY
           // const communityIdObject = await Community.findById(communityId); 
-    const communityIdObject = await Community.findOne(
+    const Community_ = await Community.findOne(
       { id: communityId },
       { _id: 1 }
     );
@@ -28,7 +29,7 @@ export async function createThread({ text, author, communityId, path }: Params
     const created_Thread = await Thread.create({
       text,
       author,
-      community: communityIdObject ? communityIdObject._id : null,
+      community: Community_ ? Community_._id : null,
       // path
     });
 
@@ -36,12 +37,11 @@ export async function createThread({ text, author, communityId, path }: Params
       $push : {threads: created_Thread._id}
     })
 
-    if (communityIdObject) {
-      await Community.findByIdAndUpdate(communityIdObject , {
+    if (Community_) {
+      await Community.findByIdAndUpdate(Community_ , {
         $push : {threads : created_Thread._id}
       })
     }
-    
     revalidatePath(path)
   }
   catch (error) {
@@ -50,12 +50,15 @@ export async function createThread({ text, author, communityId, path }: Params
   } 
 }
 
-
-export async function fetchPosts(pageNumber = 1 , pageSize = 6){
-  connectTODB();
+//CHECK THE PAGE IN THE COMPONENT !
+export async function fetchPosts(pageNumber= 1 , pageSize : number){
+ await connectTODB();
 
   const skipAmout = (pageNumber - 1 ) * pageSize;
-  const postQuery = Thread.find({parentId : {$in : [null , undefined]}})
+  const postQuery = Thread.find({ 
+      parentId : {$in : [null , undefined]},
+       author: { $ne: null }
+    })
   .sort({createdAt: 'desc'})
   .skip(skipAmout)
   .limit(pageSize)
@@ -67,16 +70,20 @@ export async function fetchPosts(pageNumber = 1 , pageSize = 6){
       model: User,
       select: '_id name parentId image'
     }
+  }).populate({
+    path:'community',
+    model: Community,
+    select: '_id id name image'
   })
   const totalPostsCount = await Thread.countDocuments({parentId:{$in: [null, undefined]}})
-
-  const posts = await postQuery.exec()
+  
+  const posts = await postQuery.exec()  
   const isNext = totalPostsCount > skipAmout + posts.length;
   return {isNext, posts}
 }
 
 export async function fetchThreadById(id: string){
-  connectTODB();
+ await  connectTODB();
 
   try{
     const thread = await Thread.findById(id)
@@ -104,6 +111,10 @@ export async function fetchThreadById(id: string){
       //   }
       // }
     // ]
+    }).populate({
+      path: 'community',
+      model : Community,
+      select : '_id id name createdById image'
     }).exec();
       return thread;
   }
@@ -112,7 +123,6 @@ export async function fetchThreadById(id: string){
       throw new Error('ERROR ERROR ERROR fetchThreadById')
   }
 }
-
 
 export async function addComment2Thread(
  { threadId ,
@@ -128,7 +138,7 @@ export async function addComment2Thread(
 )
 
 {
-  connectTODB();
+ await connectTODB();
     try {
       const originalThread = await Thread.findById(threadId);
     
@@ -154,3 +164,26 @@ export async function addComment2Thread(
       console.log('AddComment2thred Error ', error)
     }
 }
+
+// DELETE THREAD
+
+ export const deleteThread = async ({
+  threadId,
+   communityId}: { threadId: string; userId?: string; communityId?: string}) => {
+
+    const User_thread = await User.findOne({threads : threadId});
+     User_thread.threads.$pull(threadId);
+     User_thread.save();
+
+
+    const Community_thread = await Community.findOne({threads : threadId});
+        Community_thread.threads.$pull(threadId);
+
+    await Community.updateOne(
+      { _id: communityId },
+      { $pull: { threads: threadId } }
+    );
+    await Thread.deleteOne({ _id: threadId });
+    await Thread.deleteMany({ parentId: threadId });
+
+  };

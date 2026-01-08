@@ -31,7 +31,7 @@ function Searchbar({ routeType }: Props) {
   }, [search, routeType]);
 
   return (
-    <div className='searchbar'>
+    <div className='searchbar flex gap-2'>
       <Image
         src='/assets/search-gray.svg'
         alt='search'

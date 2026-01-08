@@ -9,36 +9,25 @@ const isPublicRoute = createRouteMatcher([
   '/sign-up(.*)',
   "/api/uploadthing",
   "/api/webhooks/clerk",
-  "/api/webhooks(.*)"
 ])
 
 
 export default clerkMiddleware(async (auth, req : NextRequest) => {
+  const { userId, sessionClaims, redirectToSignIn } = await auth()
 
   if (isPublicRoute(req)) {
     return NextResponse.next();
   }
   
-  if (!isPublicRoute(req)) {
-   await auth.protect(
-        // If protection fails, redirect to the sign-in page
-        // unauthenticatedUrl: '/sign-in' 
-    );
+ // 2. PROTECT PRIVATE ROUTES
+  if (!userId) {
+    // This handles the redirect to sign-in automatically
+    await auth.protect(); 
   }
-  const { userId, sessionClaims, redirectToSignIn } = await auth()
-
-   // If the user isn't signed in and the route is private, redirect to sign-in
-  // if (!userId && !isPublicRoute(req)) return redirectToSignIn({ returnBackUrl: req.url })
-
-    // // BUT CLERK DOESNT STORE SESSIONCLAIMS!! IT DOESNT WORK Check if the user is authenticated but NOT onboarded. 
-    // const isNotOnboarded = userId && !sessionClaims?.unsafeMetadata?.onboardingComplete;
   
-
-    // // A. If user is NOT onboarded AND NOT trying to reach /onboarding, REDIRECT them to /onboarding.
-    // if (isNotOnboarded && !isOnboardingRoute(req)) {
-    //     const onboardingUrl = new URL('/onboarding', req.url);
-    //     return NextResponse.redirect(onboardingUrl);
-    // }
+   // If the user isn't signed in and the route is private, redirect to sign-in
+  if (!userId && !isPublicRoute(req)) return redirectToSignIn({ returnBackUrl: req.url })
+    
 
   // THIS IS CLERK DOCUMENTION
   // For users visiting /onboarding, don't try to redirect
@@ -46,28 +35,26 @@ export default clerkMiddleware(async (auth, req : NextRequest) => {
     return NextResponse.next()
   }
 
-// 1. Create a new headers object based on the incoming request headers
+//  Create a new headers object based on the incoming request headers
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-pathname', req.nextUrl.pathname);
-  
+  const isFirstTime = sessionClaims?.metadata?.isFirstTimeUser;
+  if (isFirstTime) {
+  requestHeaders.set('x-first-time', 'true');
+}
+
   return NextResponse.next({
     request: {
       headers: requestHeaders,
     }
   });
-
 })
 
 export const config = {
-  matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
+matcher: [
+    // Standard Next.js middleware matcher
     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
     // Always run for API routes
     '/(api|trpc)(.*)',
-    // Web-Hooks (Original)
-    '/((?!.*\\..*|_next).*)', '/',
-    
-    // Web-Hooks (CHATGPT --- FIX ---)
-    //  '/((?!api/webhooks/clerk).*)',
-  ],
-}
+  ]
+};

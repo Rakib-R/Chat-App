@@ -2,8 +2,9 @@ import React from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
-import { dark , neobrutalism } from '@clerk/themes'
 import "../globals.css";
+import { shadesOfPurple } from "@clerk/themes"
+import { shadcn } from "@clerk/themes";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,21 +21,24 @@ export default function RootLayout({
 
 
   const localization = {
+    
   signUp: {
     start: {
-      title: "Please Proceed To Enter!",
-      subtitle: 'to access {{applicationName}}',
+      title: "Fill Up To Acess ChatApp!",
+      subtitle: '',
+      actionText: "", 
     },
     emailCode: {
       subtitle: 'to access {{applicationName}}',
     },
   },
   signIn : { 
+
     start: {
       // THIS CHANGES THE SUB-HEADER TEXT
       subtitle: "Please enter your credensials", 
-      title: "Welcome Back!", 
-      actionText: "LETS GO!fdds", 
+      title: "Welcome !", 
+      actionText: "OR YOU COULD TRY TO ", 
     },
   }
 }
@@ -44,6 +48,12 @@ export default function RootLayout({
 
     localization={localization}
     appearance={{
+      // baseTheme: shadcn,
+      //   variables: {
+      //     // You can still override specific shadcn colors here if needed
+      //     colorPrimary: "hsl(var(--primary))", 
+      //   },
+
       cssLayerName : 'clerk',  
       layout : {
       socialButtonsVariant : 'iconButton',
@@ -53,51 +63,35 @@ export default function RootLayout({
     },
 
       elements : {
-         footerAction: {
-          backgroundColor : 'black'
-         } 
-         ,
-        card : {
-         backgroundImage: `
-        radial-gradient(circle, white 190px, transparent 1px),             /* Sharp Center */
-        radial-gradient(circle, rgba(255,255,255,0.5) 10px, transparent 4px), /* Soft Glow */
-        repeating-linear-gradient(-130deg, #000, #000 5px, #111 5px, #111 50px) /* Background */
-`,
-        // Size 1: auto (for stripes) | Size 2: 20px (for dots)
-        backgroundSize: 'auto, 15px 15px',
-        backgroundPosition: 'center , 10px 90px',
-        },
-        formFieldRow: {
-          paddingTop: '1rem',
-          paddingDown: '2rem',
-        },
+    
+        // card : {
+        //  backgroundImage: `
+        // radial-gradient(circle, white 190px, transparent 1px),             /* Sharp Center */
+        // radial-gradient(circle, rgba(255,255,255,0.5) 10px, transparent 4px), /* Soft Glow */
+        // // repeating-linear-gradient(-130deg, white, white 5px, white 5px, white 50px) /* Background */`,
+        // // Size 1: auto (for stripes) | Size 2: 20px (for dots)
+        // backgroundSize: 'auto, 15px 15px',
+        // backgroundPosition: 'center , 10px 90px',
+        // },
+   
       userButtonPopoverActions__singleSession : {
       backgroundColor : '#49247A'
       },
-          userPreview : 'bg-black',
-          userPreview__userButton : 'bg-black',
-          userButtonAvatarBox : 'bg-black font-larger', 
-          userButton : "bg-black",
+        userPreview : 'bg-black',
+        userPreview__userButton : 'bg-black',
+        userButtonAvatarBox : 'bg-black font-larger', 
+        userButton : "bg-black",
          footer: {
          fontSize: 14,
         textTransform: 'none',  
-      }
+       }
       },
     
     }}
     >
       <html lang='en' >
-        <body className={`${inter.className} grid grid-flow-col w-screen h-screen justify-center items-center gap-6`
-        } 
-        style={{backgroundImage : 
-          `  radial-gradient(circle, white 210px, transparent 1px), 
-            radial-gradient(circle, rgba(255,255,255,0.5) 10px, transparent 4px),
-            repeating-linear-gradient(-130deg, #000, #000 5px, #111 5px, #111 50px)   
-        ` ,
-        backgroundSize: 'auto, 15px 15px',  
-        backgroundPosition: '-140px -15px, 0 100px',
-        }}>
-        
+        <body className={`${inter.className} grid grid-flow-col bg-slate-600 w-screen h-screen justify-center items-center gap-6`
+        } >
         
       {children}
       

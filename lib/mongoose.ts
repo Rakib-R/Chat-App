@@ -1,19 +1,48 @@
-import mongoose from 'mongoose';
+  import mongoose from 'mongoose';
 
-export const connectTODB = async () => {
-    try {
-        const conn = await mongoose.connect(process.env.MONGODB_URI as string, {
-            // Recommended options for modern Mongoose (no longer strictly necessary but good practice)
-            serverSelectionTimeoutMS: 2000, // Timeout after 5s for the initial connection handshake
-             // The default is 10000. Set low once connection is verified.
-        });
+  interface MongooseCache {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
+}
 
-        console.log(`MongoDB Connected: ${conn.connection.host}`);
-    } catch (err) {
-        console.error(`Error: ${err instanceof Error ? err.message : String(err)}`);
-        // Exit process with failure
-        process.exit(1);
+  const MONGODB_URI = process.env.MONGODB_URI;
+
+  if (!MONGODB_URI) {
+    throw new Error('Please define the MONGODB_URI environment variable');
+  }
+
+  /* Usse a global variable to store the connection so it 
+     persists across hot-reloads in development.
+   */
+  let cached: MongooseCache = (global as any).mongoose;
+
+  if (!cached) {
+    cached = (global as any).mongoose = { conn: null, promise: null };
+  }
+
+  export const connectTODB = async () => {
+    // If we already have a connection, return it immediately
+    if (cached.conn) return cached.conn;
+
+    if (!cached.promise) {
+      const opts = {
+        serverSelectionTimeoutMS: 10000,
+        maxPoolSize: 10, // ✅ Add connection pooling
+        minPoolSize: 1,
+        bufferCommands: false, // Turn off buffering for faster error reporting
+      };
+
+      cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+        console.log("=> New MongoDB Connection Established");
+        return mongoose;
+      });
     }
-};
+        try {
+          cached.conn = await cached.promise;
+        } catch (e) {
+          cached.promise = null;
+          throw e;
+        }
 
-connectTODB();
+    return cached.conn;
+  };

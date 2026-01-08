@@ -22,7 +22,7 @@ const ProfileHeader = ({
     : Props ) => 
       {
   return (
-    <div className='flex p-4 h-fit flex-col items-start bg-amber-400'>
+    <div className='flex p-4 h-fit flex-col items-start'>
       <div className="flex flex-col justify-between">
         <div className='flex items-center gap-3'>
           <div>

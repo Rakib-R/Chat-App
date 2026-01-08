@@ -4,12 +4,6 @@ export const sidebarLinks = [
     route: "/",
     label: "Home",
   },
-
-  // {
-  //   imgUrl : "/assets/thread.svg",
-  //   route  :  "/thread",
-  //   label  : "Thread"
-  // },
   {
     imgURL: "/assets/create.svg",
     route: "/create-thread",
@@ -27,8 +21,8 @@ export const sidebarLinks = [
   },
   {
     imgURL: "/assets/community.svg",
-    route: "/communities",
-    label: "Communities",
+    route: "/community",
+    label: "Community",
   },
   {
     imgURL: "/assets/user.svg",

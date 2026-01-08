@@ -26,7 +26,7 @@ import { updateUser } from "@/lib/actions/user.actions";
 // UPLOADTHING
 import { useUploadThing } from "@/lib/uploadthing";
 import Experimental_Profile_Pic from "./Experimental_Profile_Pic";
-
+import "@uploadthing/react/styles.css";
 
 interface Props {
   user: {
@@ -62,7 +62,6 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
   
   const onSubmit = async (values: z.infer<typeof UserValidation> ) => {
     try {
-      
       const blob = values.profile_photo;
       
       const hasImageChanged = isBase64Image(blob);
@@ -71,11 +70,12 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
         if (files.length === 0) return;
         
         const imgRes = await startUpload(files);
-        if (imgRes && imgRes[0].ufsUrl ) {
-          values.profile_photo = imgRes[0].ufsUrl ;
+      if (imgRes && imgRes[0].ufsUrl) {
+        values.profile_photo = imgRes[0].ufsUrl;
         }
       }
       // UPDATE OR CREATE USER IF-NOT EXISTS AFTER ON SUBMIT
+
     await updateUser({
       userId: user.id,
       name: values.name,
@@ -84,67 +84,59 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
       bio: values.bio,
       image: values.profile_photo,
     });
-    
+
     if (pathname === "/profile/edit") {
       router.back();
     } else {
       router.push("/");
     }
-
   }
     catch(error: any) {
-        console.log('Error Occured : ', error.code, error.message)
+        console.log('Error Occured at AccProfile: ', error.code, error.message)
         setError(error.message)
     }
   };
 
   // // CURRENTLY UNUSED
-  // const handleImage = (
-  //   e: ChangeEvent<HTMLInputElement>,
-  //   fieldChange: (value: string) => void
-  // ) => {
-  //   e.preventDefault();
-  //   const fileReader = new FileReader();
-
-  //   if (e.target.files && e.target.files.length > 0) {
-  //     const file = e.target.files[0];
-  //     setFiles(Array.from(e.target.files));
-
-  //     if (!file.type.includes("image")) return;
-  //     fileReader.onload = async (event) => {
-  //       const imageDataUrl = event.target?.result?.toString() || "";
-  //       fieldChange(imageDataUrl);
-  //     };
-  //     fileReader.readAsDataURL(file);
-  //   }
-  // };
-
   return (
     <> 
     <Form {...form}>
       <form
-        className='flex flex-col justify-start gap-10'
+        className='flex flex-col justify-start gap-10 text-blue-800 font-semibold'
         onSubmit={form.handleSubmit(onSubmit)}
+        >
+    {error && (
+      <main className="absolute bg-amber-300 -ml-16 w-[512px]">
+          <div className="absolute bg-slate-600 w-full -mt-36 h-20"></div>
+           <div className="absolute -mt-36 flex items-center bg-red-500/10 border break-words border-red-500/50 p-3 rounded-lg animate-in fade-in zoom-in duration-300">
+          <span className="text-red-500 text-sm font-medium">⚠️ {error}</span>
+          <Button 
+            type="button"
+            onClick={() => setError('')} // This clears the error so they can try again
+            className="border-red-500/50 hover:bg-red-500/10 text-red-500 h-8"
       >
-        <div className='color-red-500 font-bold text-center w-full h-full'> 
-          {error}
+        Retry
+      </Button>
         </div>
-
-   <FormField
+      </main>
+     
+          )}
+    <FormField
           control={form.control}
           name='profile_photo'
           render={({ field }) => (
             <FormItem className=''>  
-              <FormControl>
-
-            <Experimental_Profile_Pic /> 
-
-              </FormControl>     
-                <FormMessage className='text-red-500' />
+            <FormControl>
+            <Experimental_Profile_Pic 
+              onChange={field.onChange} 
+              setFiles={setFiles} 
+              initialImage={field.value}
+            />
+      </FormControl>
             </FormItem>
           )}
-        />
-
+        /> 
+        
         <FormField
           control={form.control}
           name='name'
@@ -156,7 +148,7 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
               <FormControl>
                 <Input
                   type='text'
-                  className='account-form_input no-focus'
+                  className='account-form_input no-focus text-white'
                   {...field}
                 />
               </FormControl>
@@ -177,7 +169,7 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
               <FormControl>
                 <Input
                   type='text'
-                  className='account-form_input no-focus'
+                  className='account-form_input no-focus text-white'
                   {...field}
                 />
               </FormControl>
@@ -197,7 +189,7 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
               <FormControl>
                 <Textarea
                   rows={10}
-                  className='account-form_input no-focus'
+                  className='account-form_input no-focus text-white'
                   {...field}
                 />
               </FormControl>
@@ -205,7 +197,8 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
             </FormItem>
           )}
         />
-        <Button type='submit' className='bg-primary-500'>
+
+        <Button type='submit' className='bg-black '>
           {btnTitle}
         </Button>
       </form>

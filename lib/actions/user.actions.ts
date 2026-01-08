@@ -19,9 +19,9 @@ export async function updateUser({
   image,
 }: Params): Promise<void> {
   try {
-    connectTODB();
-
-    await User.findOneAndUpdate(
+  await connectTODB();
+    
+  const updateUser =  await User.findOneAndUpdate(
       { id: userId },
       {
         username: username.toLowerCase(),
@@ -30,28 +30,34 @@ export async function updateUser({
         image,
         onboarded: true,
       },
-      { upsert: true }
+      { upsert: true,
+        new: true, runValidators: true // CLAUDE TO PREVENT RESOLVE USER CREATION ERROR
+       }
     );
 
     if (path === "/profile/edit") {
       revalidatePath(path);
     }
+
+  console.log('User Created BEFORE new Promise ')
+   return updateUser;
+
   } catch (error: any) {
+    ///DUPLICATE AND NETWORK ERROR BOUNDARY  DITE HOBE
     throw new Error(`Failed to create/update user: ${error.message}`);
   }
 }
 
-
-export async function fetchUser(userId: string) {
+export async function fetchUser(userId: string | number | Record<string, string>[]) {
   try {
-    connectTODB();
+    await connectTODB();
 
     return await User.findOne({ id: userId }).populate({
       path: "communities",
       model: Community,
     });
   } catch (error: any) {
-    throw new Error(`Failed to fetch user: ${error.message}`);
+    throw new Error(`Failed to fetch User: ${error.message}`);
   }
 }
 
@@ -64,11 +70,9 @@ interface Params {
   path: string;
 }
 
-
 export async function fetchUserPosts(userId: string) {
   try {
-    connectTODB();
-    
+   await connectTODB();
     const threads = await User.findOne({ id: userId }).populate({
       path: "threads",
       model: Thread,
@@ -111,12 +115,11 @@ export async function fetchUsers({
   sortBy?: SortOrder;
 }) {
   try {
-    connectTODB();
+   await  connectTODB();
     const skipAmount = (pageNumber - 1) * pageSize;
 
     // CASE INSENSITIVE REG
     const regex = new RegExp(searchString, "i");
-
     const query: FilterQuery<typeof User> = {
       id: { $ne: userId },
     };
@@ -131,7 +134,6 @@ export async function fetchUsers({
 
     // Define the sort options for the fetched users based on createdAt field and provided sort order.
     const sortOptions = { createdAt: sortBy };
-
     const usersQuery = User.find(query)
       .sort(sortOptions)
       .skip(skipAmount)
@@ -153,12 +155,15 @@ export async function fetchUsers({
 
 export async function getActivity(userId: string) {
   try {
-    connectTODB();
+   await connectTODB();
 
     const userThreads = await Thread.find({ author: userId });
-    const childThreadIds = userThreads.reduce((acc, userThread) => {
+    const childThreadIds_original = userThreads.reduce((acc, userThread) => {
       return acc.concat(userThread.children);
     }, []);
+
+    // Consider using Array.from(new Set(childThreadIds)) to deduplicate.
+    const childThreadIds = Array.from(new Set(childThreadIds_original))
 
     // Find and return the child threads (replies) excluding the ones created by the same user
     const replies = await Thread.find({

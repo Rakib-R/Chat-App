@@ -1,11 +1,13 @@
+export const dynamic = "force-dynamic";
 
 import { fetchPosts } from '@/lib/actions/thread.actions';
 import ThreadCard from '@/components/cards/ThreadCard';
 
 // CLERK ORGANIZATION
-import {auth, currentUser, clerkClient, Organization, } from '@clerk/nextjs/server'
-import { createCommunity } from "@/lib/actions/community.actions";
-import { fetchUser } from '@/lib/actions/user.actions';
+import { currentUser, User } from '@clerk/nextjs/server'
+import { getUserOrganizations } from "@/app/organization";
+import Pagination from '@/components/shared/Pagination';
+import { cleanupDatabase } from '@/lib/actions/cleanup.actions';
 
 type PageProps = {
   params:Promise< { 
@@ -15,60 +17,28 @@ type PageProps = {
     [key: string]: string | string[] | undefined 
   }>;
 };
- 
+
+
 async function Home ({ searchParams}:  PageProps) {
 
   const user = await currentUser();
   if (!user) return null;
-  const { orgId, orgRole } = await auth();
 
-  const result = await fetchPosts(1, 20) ;
-  const userInfo = await fetchUser(user.id)
+  // VERY IMPORTANT CLEAN UP DATABASE FUNC
+  // await cleanupDatabase();
+  const resolvedSearchParams = await searchParams;
+  const page = resolvedSearchParams.page ? +resolvedSearchParams.page : 1;
+  const result = await fetchPosts(page, 4) ;
 
-  // **** ORGANIZATION FETCHING  ****
-
-  const isAdmin = orgRole === "org:admin"; 
-  const isMember = orgRole === "org:member";
-
-    if(!orgId || !orgRole){
-    return <p> No organization Attributes found</p>
-  }
-
-  const client = await clerkClient();
-  // TypeScript now knows orgId is a string inside this block
-  const org: Organization = await client.organizations.getOrganization({ 
-    organizationId: orgId 
-    });
-
-    // ORGANIZATION MEMBERSSS
-     const memberships = await client.organizations.getOrganizationMembershipList({
-    organizationId: orgId,
-    limit: 10, 
-      });
-
-    const members = memberships.data;
-
-    // ORGANIZATION USER DETAILS
-    let orgDetails = org;
-
-    if (orgId && orgDetails) {
-    await createCommunity(
-      {
-      id : orgId,
-      name: orgDetails.name,
-      username: orgDetails.slug || orgDetails.name.toLowerCase().replace(/\s+/g, ""),
-      description: userInfo.bio,
-      image: orgDetails.imageUrl,
-      createdById :user.id }
-    );
-}
-    console.log('%cMembers', 'font-size:14px; color:green', members , orgDetails?.id) 
-  
     return (
-    <div className=' text-2xl text-black text-center'>
-       <section>
+    <div >
+       <section className='text-2xl h-inherit text-black text-center'>
+        
         {result.posts.length == 0 ?  (
-          <p>No posts found.</p>
+            <div className='flex gap-4 my-8'>
+              <p>No posts found. Please Create some  </p>
+              <img src="/post.png" alt="Post" width={80} height={80}/>
+            </div>
         ) :
         (
           <>
@@ -83,14 +53,13 @@ async function Home ({ searchParams}:  PageProps) {
               createdAt={post.createdAt}
               comments={post.children}
 
-              orgId={orgId}
-              role={isAdmin || isMember}
-              orgName={orgDetails.name}
-              orgImg={orgDetails.imageUrl as string}
-              orgMembers={members}
-              
             />
           ))}
+          <Pagination 
+            pageNumber={page} 
+            isNext={result.isNext}
+            path= {''}
+         />
           </>
         ) 
       }
