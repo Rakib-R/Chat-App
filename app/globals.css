@@ -3,7 +3,6 @@
 
 @import 'tailwindcss';
 @import '@clerk/themes/shadcn.css';
-
 @custom-variant dark (&:is(.dark *));
 
 /* OVERWRITING CLERK PROVIDER USERBUTTON ELEMENT */
@@ -15,32 +14,52 @@
 /* ORGANIZATION SWITCHER  WORKING WORKNG !!*/
 .cl-organizationPreview{ color :white}
 .cl-organizationSwitcherTriggerIcon { color : white}
-/*ALL USER BUTTON email WORKING*/
+/*ALL USER Button EMAIL WORKING*/
 .cl-userPreviewSecondaryIdentifier, .cl-userPreviewSecondaryIdentifier__userButton{
   color: rgb(0, 9, 0);
 }
-/* CLERK SIGN UP FOOTER BG */
-.cl-footer , .cl-internal-1snnqs1{
-  background-color: red;
-}
 
-.cl-formFieldHintText .cl-formFieldHintText__firstName .cl-internal-xootgu{
+/* SIGN UP "Optional" placeholder text WORKING !!!!!*/
+.cl-internal-xootgu{
   display: none !important;
 }
+/* User Button */ /* User Button */ /* User Button */
+.cl-userButtonBox {   
+  width: 5rem;
+  height: 5rem;
+  background-color : 'red'; 
+}
+.cl-userButtonBox:focus .cl-avatarImage:focus .cl-userButtonAvatarImage:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.cl-userButtonTrigger:focus{
+  outline: none;
+  box-shadow: none;
+}
+
+.cl-avatarBox{
+  width: 4rem;
+  height: 4rem;
+  background-color : transparent;
+}
+
+.cl-avatarImage
+{
+  transform: translate(25%, 25%);
+  width: 3rem;
+  height: 3rem;
+  object-fit: contain;
+  border-radius: 1000px;
+}
+
+ /* ROOT CLERK BOX */
+ /* DONT NEED IT USE ROOT @!! */
+
 .cl-organizationPreviewMainIdentifier .cl-organizationPreviewMainIdentifier__organizationSwitcherTrigger{
   color : blue
 }
-.cl-signIn-start {
-  height: 35rem;
-  display: flex;
-  line-height: 1rem;
-}
-.zIgDIc .vAV9bf{
-  font-size: larger;
-  color: red;
-  background-color: cyan;
-}
-
 
   /* CLERK heading text */
 .zIgDIc #headingText {
@@ -55,28 +74,64 @@
 
 /* manage accound and sign out */
 .cl-userButtonPopoverActions .cl-userButtonPopoverActions__singleSession{
-  color : rgb(6, 3, 3);
   font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
-/* User Button */
-.cl-userButton-popover{
-  font-size:x-large;
-  color : rgb(10, 9, 15)
-}
 
 
-.cl-avatarBox {
-  width: 2rem;
-  height: 2rem;
-  /* background-color: bisque; */
+ /* ** ****GEMINI ****** */
+/* This targets the title you defined in the localization object */
+/* This creates a look where the second half of the line is a different color */
+ .brand-title-signIn {
+  font-weight: 700;
+  font-size: larger;
+  background: linear-gradient(to right, black 60%, #3b82f6 50%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.brand-title-signUp {
+ font-size: larger;
+  background: linear-gradient(to right, black 65%, #3b82f6 50%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-top: 1rem;
 }
 
-.thread-card_bar{
-  @apply relative my-4 rounded-full bg-white;
+.onboarding_gradient{
+    font-weight: 700;
+  /* This creates a look where the second half of the line is a different color */
+  background: linear-gradient(to right,black 60%, #3b82f6 50%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
+ .cl-card { background-color: rgb(255, 254, 254);}
+
+
+/* // FOOTER COLOR */
+ .cl-internal-1dauvpw {
+   background-color: #3b82f6
+}
+
+.cl-footerActionText, 
+.cl-footerAction {
+  display: flex;
+  align-items :center;
+  font-size: 14px ;
+  color: #3b82f6;
+  vertical-align: middle;
+  line-height: 16px;
+}
+
+/* To hide the hint text safely */
+[data-clerk-element="formFieldHintText"] {
+  display: none !important;
+}
+
+.cl-organizationPreviewMainIdentifier {
+  color: blue !important;
+}
+
 
 @layer base { 
-
 
   
 }
@@ -189,13 +244,4 @@
   --sidebar-accent-foreground : oklch(0.985 0 0);
   --sidebar-border : oklch(1 0 0 / 10%);
   --sidebar-ring : oklch(0.556 0 0);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
 }

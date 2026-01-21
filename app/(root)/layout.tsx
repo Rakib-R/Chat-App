@@ -4,14 +4,13 @@ import {
   SignedIn,
   UserButton,
   OrganizationSwitcher,
-  OrganizationProfile,
+
   
 } from '@clerk/nextjs'
 import { dark, neobrutalism, shadesOfPurple } from '@clerk/themes'
 import LeftSidebar from "@/components/shared/LeftSidebar";
 import RightSidebar from "@/components/shared/RightSidebar";
 import Topbar from "@/components/shared/Topbar";
-
 import type { Appearance } from '@clerk/types';
 
 import { Geist, Geist_Mono, Neonderthaw } from 'next/font/google'
@@ -19,13 +18,17 @@ import { Roboto } from 'next/font/google';
 import '../globals.css'
 import { currentUser } from '@clerk/nextjs/server';
 import { UploadErrorBoundary } from '@/components/Error-Boundary';
+import Notification from './Notification'
+import Call from './Call';
 
 const geist = Geist({
+  subsets: ['latin'], 
   variable : '--font-geist'
 })
 const roboto = Roboto({
+  subsets: ['latin'], 
   weight: ['100', '300', '400', '500', '700', '900'],
-  display: 'swap', // This is recommended for performance
+  display: 'swap', // RECOMMENDED for performance
   
   variable: '--font-roboto', 
 });
@@ -41,7 +44,6 @@ export default async function  RootLayout ({
   children: React.ReactNode
 }>) {
 
-  // console.log('CLERK User at app > root > layout' , user)
   // CLERK APPEARACNES 
 
   const user = await currentUser();
@@ -49,18 +51,16 @@ export default async function  RootLayout ({
   
   const userButtonAppearance = {
     elements: {
-      userButtonAvatarBox: "w-64", // Custom width and height
-      userButtonPopoverCard: "w-64", // Custom background for the popover card
-      userButtonPopoverMain : '',
-      userButtonPopoverActionButton: "text-red-600", // Custom text color for action buttons
-      userButtonPopoverActionButton__signOut : '',
-      userButtonPopoverRootBox : 'bg-red w-128'
-      ,rootBox: "w-128",                // The outermost wrapper
-      userButtonTrigger: "...",      // The clickable avatar button
-      userButtonAvatarImage: "...",  // The actual <img> tag
+      // The outermost wrapper
+      rootBox: "w-150",            
+      userButtonTrigger: "...",       
+      // OVERWRITE HEIGHT & WIDTH 
+      // SEE GLOBAL CSS
+      
+       // The clickable avatar button
       userButtonPopoverActionButton__addAccount: "text-purple-500 hover:bg-purple-50",
       // Styles the "Sign out of all accounts" button
-      userButtonPopoverActionButton__signOutAll: "text-red-500 border-t border-gray-100",
+      userButtonPopoverActionButton__signOutAll: "text-red-500",
     },
   };
   const customAppearance = {
@@ -76,18 +76,16 @@ export default async function  RootLayout ({
         fontFamily: 'var(--font-roboto)', 
       },
       
-
-  layout: {
-    // Place social buttons at the bottom
-    socialButtonsPlacement: 'bottom',
-    // Change the placement of the logo to outside the card (for a cleaner look)
-    shimmer: false
-  },
+    layout: {
+      // Place social buttons at the bottom
+      socialButtonsPlacement: 'bottom',
+      // Change the placement of the logo to outside the card (for a cleaner look)
+      shimmer: false
+    },
 
   elements: {
         card: {
-          backgroundColor: "black", //ORGANIZATIN ADD BUTTON BACKGROUUND
-          border: "1px solid rgba(255,255,255,0.1)"
+          backgroundColor: "", //ORGANIZATIN ADD BUTTON BACKGROUUND
         },
         formButtonPrimary: {
         className: "!bg-indigo-600 hover:!bg-indigo-700 !transition-all duration-300 rounded-lg !py-3 text-lg !font-bold !uppercase"
@@ -104,14 +102,15 @@ export default async function  RootLayout ({
      >
       <html lang="en" className={`h-screen ${geist.className} ${roboto.className}`} >
         <body className={`antialiased mx-8 h-[100vh] flex flex-col gap-0 justify-between text-gray-900`} >
-          <nav className="flex px-8 justify-between bg-gray-700 text-white">
+          <nav className="flex px-8 rounded-md justify-between 
+          bg-gradient-to-tr from-gray-900 via-gray-800 to-gray-700 text-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] brightness-100 ">
             <Topbar/>
             <p className='font-black self-center'>THIS IS INSIDE IN THE ROOT LAYOUT and TOPBAR</p>
-            
-            {/* // ORGANIZATIONS CLERK */}
             {/* <OrganizationProfile /> */}
             <OrganizationSwitcher />
 
+            <Call />
+            <Notification />
             {/* SIGNED USER PROFILE */}
             <SignedIn>
               <UserButton appearance={userButtonAppearance}/>
@@ -120,10 +119,9 @@ export default async function  RootLayout ({
 
         <div className='flex justify-between'>
           <LeftSidebar />
-          
           {children}
-
         <RightSidebar isFirstTime={isFirstTime} />
+
         </div>
         </body>
       </html>

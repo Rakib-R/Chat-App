@@ -24,7 +24,7 @@ const LeftSidebar = () => {
   // --- Removed unnecessary useEffect/useState ---
 
   return (
-    <section className='custom-scrollbar'>
+    <section className='mt-8 rounded-2xl w-1/5 h-full overflow-hidden'>
       <div className='flex flex-col py-8 gap-8 px-8 bg-gray-600 text-xl text-white font-sans'>
         
       <Link 
@@ -36,7 +36,7 @@ const LeftSidebar = () => {
                           group-hover:opacity-50 group-hover:scale-105 group-hover:blur-none 
                           transition-all duration-300 ease-out rounded-lg pointer-events-none" />
               <img 
-                className='rounded-xl relative z-10 transition-transform group-hover:scale-110' 
+                className='rounded-2xl relative z-10 transition-transform group-hover:scale-110' 
                 src={user?.imageUrl} 
                 alt="" 
                 width={33} 

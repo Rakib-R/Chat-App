@@ -12,43 +12,39 @@ const isPublicRoute = createRouteMatcher([
 ])
 
 
-export default clerkMiddleware(async (auth, req : NextRequest) => {
-  const { userId, sessionClaims, redirectToSignIn } = await auth()
+export default clerkMiddleware(async (auth, req: NextRequest) => {
+  const { userId, sessionClaims } = await auth();
 
+  // 1. Allow public routes (sign-in, sign-up, webhooks) to pass through immediately
   if (isPublicRoute(req)) {
     return NextResponse.next();
   }
-  
- // 2. PROTECT PRIVATE ROUTES
+
+  // 2. Protect all other routes
   if (!userId) {
-    // This handles the redirect to sign-in automatically
-    await auth.protect(); 
+    await auth.protect();
   }
-  
-   // If the user isn't signed in and the route is private, redirect to sign-in
-  if (!userId && !isPublicRoute(req)) return redirectToSignIn({ returnBackUrl: req.url })
-    
 
-  // THIS IS CLERK DOCUMENTION
-  // For users visiting /onboarding, don't try to redirect
+  // 3. Handle Onboarding bypass
   if (userId && isOnboardingRoute(req)) {
-    return NextResponse.next()
+    return NextResponse.next();
   }
 
-//  Create a new headers object based on the incoming request headers
+  // 4. Metadata sync for first-time users
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-pathname', req.nextUrl.pathname);
-  const isFirstTime = sessionClaims?.metadata?.isFirstTimeUser;
-  if (isFirstTime) {
-  requestHeaders.set('x-first-time', 'true');
-}
+  
+  // Note: Ensure your Clerk JWT template includes "metadata"
+  if (sessionClaims?.metadata?.isFirstTimeUser) {
+    requestHeaders.set('x-first-time', 'true');
+  }
 
   return NextResponse.next({
     request: {
       headers: requestHeaders,
     }
   });
-})
+});
 
 export const config = {
 matcher: [

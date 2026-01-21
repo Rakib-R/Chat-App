@@ -37,8 +37,8 @@ export default function RootLayout({
     start: {
       // THIS CHANGES THE SUB-HEADER TEXT
       subtitle: "Please enter your credensials", 
-      title: "Welcome !", 
-      actionText: "OR YOU COULD TRY TO ", 
+      title: "Welcome to ChatApp", 
+      actionText: "Don't have an account? ", 
     },
   }
 }
@@ -53,7 +53,6 @@ export default function RootLayout({
       //     // You can still override specific shadcn colors here if needed
       //     colorPrimary: "hsl(var(--primary))", 
       //   },
-
       cssLayerName : 'clerk',  
       layout : {
       socialButtonsVariant : 'iconButton',
@@ -63,7 +62,6 @@ export default function RootLayout({
     },
 
       elements : {
-    
         // card : {
         //  backgroundImage: `
         // radial-gradient(circle, white 190px, transparent 1px),             /* Sharp Center */
@@ -77,14 +75,10 @@ export default function RootLayout({
       userButtonPopoverActions__singleSession : {
       backgroundColor : '#49247A'
       },
-        userPreview : 'bg-black',
-        userPreview__userButton : 'bg-black',
+        userPreview : 'bg-indigo-500',
+        userPreview__userButton : 'bg-red-500',
         userButtonAvatarBox : 'bg-black font-larger', 
-        userButton : "bg-black",
-         footer: {
-         fontSize: 14,
-        textTransform: 'none',  
-       }
+        userButton : "bg-blue-500",
       },
     
     }}

@@ -19,7 +19,7 @@ export default function RightSidebar({ isFirstTime }: { isFirstTime: boolean }) 
   }, [isFirstTime]);
 
   return (
-    <div className='flex w-1/5 h-min justify-center'>
+    <div className='relative flex flex-col rounded-2xl w-1/5 h-full justify-center'>
       <AnimatePresence>
         { showWelcome && (
           <motion.div 
@@ -30,7 +30,8 @@ export default function RightSidebar({ isFirstTime }: { isFirstTime: boolean }) 
               duration: 0.5, 
               ease: "easeInOut" 
             }}
-            className="flex w-full items-center justify-center border-2 rounded-lg mt-8 bg-amber-400/70 z-[9999] "
+            className="absolute top-0 mt-8 flex flex-col w-full items-center justify-center border-3
+                rounded-lg bg-gray-300 px-3 py-2 shadow-[0_0_20px_rgba(79,70,229,0.5)] ring-1 ring-black/10"
           >
             <motion.h1 className="text-xl font-bold text-blue-800 p-4">
               Welcome to the App!
@@ -38,6 +39,8 @@ export default function RightSidebar({ isFirstTime }: { isFirstTime: boolean }) 
           </motion.div>
         )}
       </AnimatePresence>
+
+      <section className='flex w-full h-full mt-8 bg-red-500 rounded-2xl'>ChatBox</section>
     </div>
   )
 }

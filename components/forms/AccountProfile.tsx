@@ -64,16 +64,18 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
     try {
       const blob = values.profile_photo;
       
-      const hasImageChanged = isBase64Image(blob);
-      if (hasImageChanged) {
-      // Make SURE Image files is not empty before calling startUpload
-        if (files.length === 0) return;
-        
-        const imgRes = await startUpload(files);
-      if (imgRes && imgRes[0].ufsUrl) {
+      const hasImageChanged = blob instanceof File;
+
+    if (hasImageChanged) {
+      // Make sure we actually have the files in state
+      if (files.length === 0) return;
+
+      const imgRes = await startUpload(files);
+     if (imgRes && imgRes[0].ufsUrl) {
+        // Replace the File object with the NEW string URL from UploadThing
         values.profile_photo = imgRes[0].ufsUrl;
-        }
       }
+    }
       // UPDATE OR CREATE USER IF-NOT EXISTS AFTER ON SUBMIT
 
     await updateUser({
@@ -102,7 +104,7 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
     <> 
     <Form {...form}>
       <form
-        className='flex flex-col justify-start gap-10 text-blue-800 font-semibold'
+        className='flex flex-col justify-start gap-8 text- -800 font-semibold'
         onSubmit={form.handleSubmit(onSubmit)}
         >
     {error && (
@@ -129,8 +131,9 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
             <FormControl>
             <Experimental_Profile_Pic 
               onChange={field.onChange} 
-              setFiles={setFiles} 
+              setFile={setFiles} 
               initialImage={field.value}
+              setParentError={setError}
             />
       </FormControl>
             </FormItem>
@@ -148,7 +151,7 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
               <FormControl>
                 <Input
                   type='text'
-                  className='account-form_input no-focus text-white'
+                  className='account-form_input'
                   {...field}
                 />
               </FormControl>
@@ -169,7 +172,7 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
               <FormControl>
                 <Input
                   type='text'
-                  className='account-form_input no-focus text-white'
+                  className='account-form_input '
                   {...field}
                 />
               </FormControl>
@@ -188,8 +191,8 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
               </FormLabel>
               <FormControl>
                 <Textarea
-                  rows={10}
-                  className='account-form_input no-focus text-white'
+                  rows={8}
+                  className='account-form_input '
                   {...field}
                 />
               </FormControl>

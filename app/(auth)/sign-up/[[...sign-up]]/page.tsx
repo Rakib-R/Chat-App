@@ -1,30 +1,54 @@
 
-import { SignUp } from '@clerk/nextjs'
-import { dark , neobrutalism} from '@clerk/themes'
 
+"use client";
+import { SignIn, SignUp } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
 
 export default function Page() {
+  
+  const pathname = usePathname(); 
+  const isSignUpPath = pathname.startsWith("/sign-up")
+  
   return (
 <div className="flex flex-col items-center">
+
+{isSignUpPath && (
 <SignUp 
   appearance={{
     elements: {
-      formFieldLabelAside: {
-      display: 'none',
-    },
-      // FIX 2: Style the "Please Enter Your Credentials"
-      headerTitle: {
-        fontSize: '1.25rem',
-        fontWeight: '700',
-        color: 'indigo',
-      },
 
-      // FIX 3: Control the Footer Layout
-      footer: {
-        borderTop: '1px solid #e5e7eb',
+    rootBox: {
+    display: 'flex',
+    alignContent : 'center',
+    height: '45rem',
+    // This targets the outermost container
+  },
+    card: {
+      '&':{  // ' & ' Using This changed my Life !
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      }
+    },
+  footer:{
+        '&': {
         display: 'flex',
-        flexDirection: 'column', // Stack children vertically
-        alignItems: 'center',    // Center children horizontally
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        height: '6rem',
+         }
+      },
+      formFieldLabelAside: {
+        '&': {
+        // Not Working
+        }
+      },
+      // FIX 2: Style the "Please Enter Your Credentials"
+      headerTitle: "brand-title-signUp",
+
+      // This hides the 'Powered by Clerk' branding which adds height
+      footerActionText: {
+        fontSize: "0.8rem",
       },
 
       footerAction: {
@@ -35,16 +59,21 @@ export default function Page() {
         display: 'flex',
         justifyContent: 'center',
       },
-
+      // SIGN-IN
+       footerActionLink: {
+        color: "#3b82f6",
+        fontWeight: "bold",
+        fontSize : '1rem'
+      },
       // FIX 4: Correct Padding for Form Rows
       formFieldRow: {
-        paddingTop: '0.5rem',
-        paddingBottom: '1rem', // Changed from paddingDown
+        paddingTop: '1rem',
+        paddingBottom: '.5rem', // Changed from paddingDown
       },
     },
   }}
 />
-  
+  )} 
   {/* Custom Footer Below the Component */}
   <footer className="mt-6 text-center text-sm text-gray-300">
     <p>
@@ -55,6 +84,8 @@ export default function Page() {
     </p>
     <p className="mt-2">© 2026 YourBrand Inc.</p>
   </footer>
+
+
 </div>
   )
 }

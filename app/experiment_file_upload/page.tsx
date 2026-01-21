@@ -1,24 +1,3 @@
-// "use client";
-// import { experimental } from './experimental'
-// import { useRef } from 'react';
-
-
-// const page = () => {
-
-//     const formRef = useRef<any>('');
-
-//   return (
-//     <form action={experimental} className="flex flex-col gap-4">
-//       <label>
-//         <span>Upload a file</span>
-//         <input type="file" name="file" ref={formRef} />
-//       </label>
-//       <button type="submit">Submit</button>
-//     </form>
-//   )
-// }
-
-// export default page
 
 "use client";
 import { useRef } from "react";

@@ -63,18 +63,17 @@ const ThreadCard = async ({
     const getPathName = headersList.get('x-pathname')
     const isThreadRoute = getPathName?.includes('thread')
     const isProfileRoute = getPathName?.includes('profile')    
-
-   const showFullCommunityLink = !isComment && !isProfileRoute && Boolean(community);
-    console.log('showFullCommunityLink' , showFullCommunityLink , '(community?)' ,Boolean(community?.name))
+    const showFullCommunityLink = !isComment && !isProfileRoute && Boolean(community);
+  
   return (
      <article className='flex w-156 flex-col my-8'>
 
         <div className={`flex p-4 gap-4 flex-row rounded-xl bg-slate-800 ${isComment ? "ml-4"  : ""}  `}>
              <div className='flex flex-col relative'>
-                <Link href={`/profile/${author.id}`} className={` ? relative h-14 w-14 text-white: "" `} >
-                    <Image src={author.image || ''} alt={''} 
-                    width={`${isComment ? 40 : 70}`} height={`${isComment ? 40 : 70}`}
-                    className='cursor-pointer rounded-full' priority/>
+                <Link href={`/profile/${author.id}`} className={` ? relative rounded-2xl h-16 w-16 text-white: "" `} >
+                    <Image src={author.image || ''} alt={''}
+                    width={`${isComment ? 40 : 80}`} height={`${isComment ? 40 : 80}`}
+                    className='cursor-pointer aspect-square rounded-[2rem]' priority/>
                 </Link>  
                  <div className='flex self-center thread-card_bar absolute h-full w-0.5'>
                  </div>   

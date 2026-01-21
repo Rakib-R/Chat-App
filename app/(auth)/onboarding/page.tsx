@@ -24,13 +24,15 @@ async function Page() {
   // console.log('User' , user)
   // console.log('UserInfo ', userInfo)
   return (
-    <main className='mx-auto flex max-w-3xl flex-col justify-start px-10 py-20'>
+    <main className='mx-auto bg-white rounded-md text-black flex max-w-3xl flex-col justify-start px-10 py-20'>
       <h1 className='head-text text-green-400'>Onboarding ...</h1>
-      <p className='mt-3 font-medium text-white'>
-        Complete your profile now, to use ChatApp.
+      <p className='mt-3 font-medium'>
+        Complete your profile now, to use <span className="onboarding_gradient">
+                    ChatApp
+                  </span>.
       </p>
 
-      <section className='mt-9 p-10'>
+      <section className='mt-8'>
         <AccountProfile user={userData} btnTitle='Continue' />
       </section>
     </main>

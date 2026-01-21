@@ -10,15 +10,17 @@ import {
 import Image from 'next/image';
 
 interface props {
- setFiles: (files: File[]) => void;
-  onChange : (value : string)  => void;
+ setFile: React.Dispatch<React.SetStateAction<File[]>>;
+  onChange : (value : File)  => void;
   initialImage : string;
+  setParentError: (message: string) => void;
 
 }
 
-export const Experimental_Profile_Pic: FC<props> = ({ setFiles, onChange, initialImage }) => {
-  const [file, setFile] = useState<File | null>(null);
+export const Experimental_Profile_Pic: FC<props> = ({ setFile, onChange , setParentError}) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  
+  const MAX_FILE_SIZE = 1 * 1024 * 1024;
 
   // 1. UPLOADTHING HOOK
   const { startUpload, routeConfig, isUploading } = useUploadThing("media", {
@@ -26,39 +28,46 @@ export const Experimental_Profile_Pic: FC<props> = ({ setFiles, onChange, initia
       const uploadedUrl = res?.[0]?.ufsUrl;
       if (uploadedUrl) {
         setPreviewUrl(uploadedUrl);
-        setFile(null); // Clear selected file after success
+        setFile([]); // Clear selected file after success
         alert("Upload Complete!");
       }
     },
     onUploadError: (error) => {
-      alert(`Upload failed: ${error.message}`);
+      setParentError(`Upload failed: ${error.message}`);
     },
   });
 
   // 2. DROPZONE HANDLER
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    const selectedFile = acceptedFiles[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      // Create local preview
-
-      // HAS-IMAGE CHANGED FUNCTION FROM ACCOUNT PROFILE
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64 = e.target?.result as string;
-        setPreviewUrl(base64); // Local preview
-        onChange(base64);      // Tell React Hook Form the value changed
-      };
-      reader.readAsDataURL(selectedFile);
+const onDrop = useCallback((acceptedFiles: File[]) => {
+  const selectedFile = acceptedFiles[0];
+  
+  if (selectedFile.size > MAX_FILE_SIZE) {
+    setParentError("This image is too heavy (Max 2MB). Please choose a smaller file.");
+      return; // Stop the function here
     }
-  }, []);
 
-  const { getRootProps, getInputProps, isDragActive, isFocused } = useDropzone({
+  else {
+    // 1. Update the Form State IMMEDIATELY (True "Change" event)
+    // We pass the File object, not a string.
+    onChange(selectedFile); 
+
+    // 2. Update local state for the UI
+    setFile(acceptedFiles);
+
+    // 3. Create a preview URL (Using Blob for better performance)
+    const objectUrl = URL.createObjectURL(selectedFile);
+    setPreviewUrl(objectUrl);
+  }
+}, [onChange]);
+
+
+  const { getRootProps, getInputProps, isDragActive, isFocused ,} = useDropzone({
     onDrop,
     accept: routeConfig 
       ? generateClientDropzoneAccept(generatePermittedFileTypes(routeConfig).fileTypes)
       : undefined,
     multiple: false,
+    maxSize: 2000000,
   });
 
   // Clean up object URLs to prevent memory leaks
@@ -88,14 +97,13 @@ export const Experimental_Profile_Pic: FC<props> = ({ setFiles, onChange, initia
         <input {...getInputProps()} />
 
         {previewUrl ? (
-          <div className="relative w-full h-full">
+          <div className="relative w-full h-full rounded-2xl">
             <Image
               src={previewUrl}
               alt="Preview"
               width={50}
               height={50}
-              className="w-full h-full object-cover p-4"
-              priority
+              className="w-full h-full object-cover"
             />
             {/* Hover Overlay */}
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
