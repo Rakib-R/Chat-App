@@ -5,43 +5,48 @@ import Link from "next/link";
 import { SignOutButton, SignedIn } from "@clerk/nextjs";
 import { useUser } from '@clerk/nextjs';
 import { sidebarLinks } from "@/constants";
-
 import { usePathname } from "next/navigation";
-// Removed unnecessary `useRouter` and `useEffect`/`useState`
 
-const LeftSidebar = () => {
-  const { isLoaded, isSignedIn, user } = useUser();
+
+interface imageProps {
+  userDBImage : string
+}
+
+const LeftSidebar = ({userDBImage : userDBImage} : imageProps) => {
+  const { isSignedIn, user } = useUser();
   const pathName = usePathname(); // The current URL pathname (e.g., '/profile/123')
   const userId = isSignedIn ? user?.id : null; 
   
   // 2. -- CRITICAL FIX: Handle Loading State ---
       // STUPID GEMINI HALLUCINATION AND HIGH IGNORANCE .. IT RUNS WITHOUT THIS BLOCK OF CODE !!!!
-
-  // if (!isLoaded) {
-  //   // Return a loading state while Clerk initializes
-  //   return <div className='p-8 text-white text-center'>Loading...</div>; 
-  // }
-  // --- Removed unnecessary useEffect/useState ---
+    // if (!isLoaded) {
+    //   // Return a loading state while Clerk initializes
+    //   return <div className='p-8 text-white text-center'>Loading...</div>; 
+    // }
+    // --- Removed unnecessary useEffect/useState ---
 
   return (
     <section className='mt-8 rounded-2xl w-1/5 h-full overflow-hidden'>
       <div className='flex flex-col py-8 gap-8 px-8 bg-gray-600 text-xl text-white font-sans'>
         
       <Link 
-          className="relative flex items-center px-2 py-2 gap-4 hover:bg-slate-900/10 rounded-lg group transition-all"
+          className="relative flex items-center py-4 gap-4 hover:bg-slate-900/10 rounded-lg group transition-all"
           href={`/profile/${user?.id}`}
         >
           {/* Animated Background Layer */}
-          <div className="absolute bg-red-600 inset-0 -z-10 opacity-0 scale-95 blur-sm 
+          <div className=" inset-0 -z-10 opacity-0 scale-95 blur-sm 
                           group-hover:opacity-50 group-hover:scale-105 group-hover:blur-none 
                           transition-all duration-300 ease-out rounded-lg pointer-events-none" />
-              <img 
-                className='rounded-2xl relative z-10 transition-transform group-hover:scale-110' 
-                src={user?.imageUrl} 
-                alt="" 
-                width={33} 
-                height={33} 
-              />
+             <figure>
+               <img 
+                  className='rounded-full h-[4.5vh] w-[2vw] relative z-10 
+                  transition-transform group-hover:scale-110' 
+                  src={userDBImage || user?.imageUrl} 
+                  width={72}
+                  height={64}
+                  alt="" 
+                />
+             </figure>
           
           <span className="relative z-10 text-white font-medium">
             {user?.fullName}
@@ -65,7 +70,6 @@ const LeftSidebar = () => {
             (routePath === '/' && pathName === '/') ||
             (routePath !== '/' && pathName.startsWith(routePath));
           
-
           return (
             <Link
               href={routePath}

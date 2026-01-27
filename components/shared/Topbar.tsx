@@ -4,8 +4,6 @@ import React from 'react'
 
 
 const Topbar = () => { 
-
-  const isUserLoggedIn = true;
   
   return (
       <nav className=' h-24 text-xl'>

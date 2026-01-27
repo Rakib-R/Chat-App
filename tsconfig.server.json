@@ -2,8 +2,9 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "module": "CommonJS",
+    "moduleResolution": "node",
+    "noEmit": false,        // <--- Forces conversion to CommonJS for the server
     "outDir": "dist",
-    "noEmit": false
   },
   "include": ["server.ts"]
 }

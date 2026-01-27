@@ -5,6 +5,7 @@ import User from "../models/user.model";
 import Thread from "../models/thread.model";
 import Community from "../models/community.model";
 import { revalidatePath } from "next/cache";
+import Tag from "@/lib/models/tag.model";
 
 
 interface Params {
@@ -166,19 +167,19 @@ export async function addComment2Thread(
 }
 
 // DELETE THREAD
-
  export const deleteThread = async ({
   threadId,
    communityId}: { threadId: string; userId?: string; communityId?: string}) => {
 
+    // THREAD GETS DELETED FROM USER
     const User_thread = await User.findOne({threads : threadId});
      User_thread.threads.$pull(threadId);
      User_thread.save();
 
-
     const Community_thread = await Community.findOne({threads : threadId});
         Community_thread.threads.$pull(threadId);
 
+    // COMMUNITY ALSO TORE REFERENCE WITH THREAD
     await Community.updateOne(
       { _id: communityId },
       { $pull: { threads: threadId } }
@@ -187,3 +188,26 @@ export async function addComment2Thread(
     await Thread.deleteMany({ parentId: threadId });
 
   };
+
+
+  export async function tagUsersInThread(
+  threadId: string,
+  authorId: string,
+  usernames: string[]
+) {
+  if (!usernames.length) return;
+
+  const users = await User.find({
+    username: { $in: usernames },
+  }).select("_id");
+
+  if (!users.length) return;
+
+  const tags = users.map(user => ({
+    thread: threadId,
+    mentionedUser: user._id,
+    mentionedBy: authorId,
+  }));
+
+  await Tag.insertMany(tags);
+}

@@ -10,8 +10,8 @@ const userSchema = new mongoose.Schema({
     bio : String,
     threads : [
     {
-        type : mongoose.Schema.Types.ObjectId,
-        ref : "Thread"}
+    type : mongoose.Schema.Types.ObjectId,
+    ref : "Thread"}
     ]
     ,
     onboarded : {

@@ -4,10 +4,10 @@ import { fetchPosts } from '@/lib/actions/thread.actions';
 import ThreadCard from '@/components/cards/ThreadCard';
 
 // CLERK ORGANIZATION
-import { currentUser, User } from '@clerk/nextjs/server'
-import { getUserOrganizations } from "@/app/organization";
+import { currentUser } from '@clerk/nextjs/server'
 import Pagination from '@/components/shared/Pagination';
 import { cleanupDatabase } from '@/lib/actions/cleanup.actions';
+import { redirect } from 'next/navigation';
 
 type PageProps = {
   params:Promise< { 
@@ -20,22 +20,25 @@ type PageProps = {
 
 
 async function Home ({ searchParams}:  PageProps) {
-
   const user = await currentUser();
-  if (!user) return null;
+
+ // FIX: If not logged in, send to sign-in (instead of returning null)
+  if (!user) redirect("/sign-in");
 
   // VERY IMPORTANT CLEAN UP DATABASE FUNC
+  //  DO NOT NEED IT 
   // await cleanupDatabase();
+  
   const resolvedSearchParams = await searchParams;
   const page = resolvedSearchParams.page ? +resolvedSearchParams.page : 1;
   const result = await fetchPosts(page, 4) ;
 
     return (
-    <div >
-       <section className='text-2xl h-inherit text-black text-center'>
+    <main className='overflow-auto'>
+       <section className='text-2xl h-inherit text-black text-center '>
         
         {result.posts.length == 0 ?  (
-            <div className='flex gap-4 my-8'>
+            <div className='flex gap-4 my-15'>
               <p>No posts found. Please Create some  </p>
               <img src="/post.png" alt="Post" width={80} height={80}/>
             </div>
@@ -64,7 +67,7 @@ async function Home ({ searchParams}:  PageProps) {
         ) 
       }
       </section>
-    </div>
+    </main>
   )
 }
 

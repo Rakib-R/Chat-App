@@ -42,3 +42,13 @@ export const communityTabs = [
   { value: "members", label: "Members", icon: "/assets/members.svg" },
   { value: "requests", label: "Requests", icon: "/assets/request.svg" },
 ];
+
+export const realisticPhrases = [
+    "Hey, did you see the update on the project?",
+    "I'll be there in about 10 minutes, just grabbing coffee.",
+    "Can we reschedule our meeting to tomorrow morning?",
+    "That sounds like a great plan, let's go with it.",
+    "Did you check out that new restaurant downtown?",
+    "I'm still working on the bug report, will send soon.",
+    "Just sent you the files via email. Let me know!"
+  ];

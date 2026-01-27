@@ -1,5 +1,5 @@
 "use client";
-import { SignIn, SignUp } from "@clerk/nextjs";
+import { SignIn } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 
 export default function Page() {

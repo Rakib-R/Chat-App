@@ -31,6 +31,18 @@ app.prepare().then(() => {
         socket.to(roomId).emit('user-disconnected', userId);
       });
     });
+
+    // FOR PREVENTING LISTENER LEAKS WITH MORE THAN 2 USERS
+    socket.on('disconnecting', () => {
+       // socket.rooms is a Set containing the socket ID and the rooms it joined
+       for (const room of socket.rooms) {
+         if (room !== socket.id) {
+           // You might need to store the userId associated with this socket separately
+           // to emit the correct ID here.
+           // socket.to(room).emit('user-disconnected', userId); 
+         }
+       }
+    });
   });
 
   // Use a Regex literal /.*/ instead of string '*' or '.*'

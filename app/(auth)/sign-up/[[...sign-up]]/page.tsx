@@ -1,7 +1,7 @@
 
 
 "use client";
-import { SignIn, SignUp } from "@clerk/nextjs";
+import { SignUp } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 
 export default function Page() {
@@ -37,6 +37,16 @@ export default function Page() {
         alignItems: 'center',
         height: '6rem',
          }
+      },
+        // FIELD ERROR SHOW
+      formFieldInput: {
+        '&:not(:placeholder-shown):invalid': {
+          borderColor: '#ef4444', // Red border immediately on bad email
+          color: '#ef4444',
+        },
+        '&:focus': {
+          borderColor: '#3b82f6', // Indigo on focus
+        }
       },
       formFieldLabelAside: {
         '&': {

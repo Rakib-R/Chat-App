@@ -26,20 +26,20 @@ async function Page({params} :Readonly <{params:Promise <{id : string}>}>
         authUserId={user.id}
         name={userInfo.name}
         username={userInfo.username}
-        imgUrl={userInfo.image}
-        bio={userInfo.bio}
+        imgUrl={userInfo.image!}
+        bio={userInfo.bio!}
   />
       <div className="mt-9 ">
-          <Tabs defaultValue="threads" className='w-full'>
-              <TabsList className="tab w-full">
-                {profileTabs.map((tab) =>( 
-                  <TabsTrigger key={tab.label} value={tab.value} className="tab">
-                        <Image src={tab.icon} alt= {tab.label}width={24} height={24} className="object-contain"
-                        />
-                      {tab.label === 'Threads' && (<p className="ml-1 rounded-sm bg-red-200 px-6 py-1">
-                        {userInfo?.threads?.length} </p>
-                        )}
-                      </TabsTrigger> 
+        <Tabs defaultValue="threads" className='w-full'>
+            <TabsList className="tab w-full">
+              {profileTabs.map((tab) =>( 
+                <TabsTrigger key={tab.label} value={tab.value} className="tab">
+                      <Image src={tab.icon} alt= {tab.label}width={24} height={24} className="object-contain"
+                      />
+                    {tab.label === 'Threads' && (<p className="ml-1 rounded-sm bg-red-200 px-6 py-1">
+                      {userInfo?.threads?.length} </p>
+                      )}
+                    </TabsTrigger> 
                     ))}
               </TabsList>
 

@@ -15,7 +15,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ThreadValidation } from "@/lib/validations/thread";
 import { createThread } from "@/lib/actions/thread.actions";
-import { getCurrentOrg } from "@/app/organization";
 import { useEffect, useState } from "react";
 
 
@@ -26,44 +25,6 @@ interface Props {
 export function PostThread({userId}: Props) {   
   const router = useRouter();
   const pathname = usePathname();
-
-  interface OrgData {
-  id: string;
-  name: string;
-  img: string;
-}
-
-  interface OrgData {
-  id: string;
-  name: string;
-  img: string;
-}
-
-const [orgData, setOrgData] = useState<OrgData | null>(null);
-const [loading, setLoading] = useState(true);
-
-useEffect(() => {
-  async function fetchData() {
-    const orgs = await getCurrentOrg();
-
-    if (!orgs) {
-      setLoading(false);
-      return;
-    }
-
-    const { orgId, orgImg, orgName } = orgs;
-
-    setOrgData({
-      id: orgId,
-      name: orgName,
-      img: orgImg,
-    });
-
-    setLoading(false);
-  }
-
-  fetchData();
-}, []);
 
 
   const form = useForm<z.infer<typeof ThreadValidation>>({
@@ -79,7 +40,7 @@ useEffect(() => {
       await createThread({
       text: values.thread,
       author: userId,
-      communityId: orgData ? orgData.id : null,
+      // communityId: ,
       path: pathname,
     });
 

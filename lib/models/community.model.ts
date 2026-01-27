@@ -13,7 +13,15 @@ import mongoose from "mongoose";
       { type: mongoose.Schema.Types.ObjectId, ref: "Thread" }
     ],
     members: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "User" }
+    {  
+      user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: false },
+      
+      fallback: {
+        name: { type: String, default: "Deleted User" },
+        image: { type: String, default: "/default-avatar.png" },
+        username: { type: String, default: "deleted_user" },
+      }
+}
     ]
 });
 

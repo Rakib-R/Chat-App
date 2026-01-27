@@ -6,8 +6,19 @@ import { revalidatePath } from "next/cache";
 import Community from "../models/community.model";
 import Thread from "../models/thread.model";
 import User from "../models/user.model";
-
 import { connectTODB } from "../mongoose";
+import { Types } from "mongoose";
+
+export interface IUser {
+  _id: string;
+  id: string;
+  username: string;
+  name: string;
+  bio?: string;
+  image?: string;
+  onboarded: boolean;
+  threads: Types.ObjectId[]; // single or array
+}
 
 
 export async function updateUser({
@@ -31,7 +42,6 @@ export async function updateUser({
         onboarded: true,
       },
       { upsert: true,
-        new: true, runValidators: true // CLAUDE TO PREVENT RESOLVE USER CREATION ERROR
        }
     );
 
@@ -43,19 +53,39 @@ export async function updateUser({
    return updateUser;
 
   } catch (error: any) {
-    ///DUPLICATE AND NETWORK ERROR BOUNDARY  DITE HOBE
-    throw new Error(`Failed to create/update user: ${error.message}`);
+    // 🔥 DUPLICATE KEY (username, email, etc.)
+    if (error?.code === 11000) {
+      const field = Object.keys(error.keyValue)[0];
+
+      //// these funcking erroes doesnt show up 🐦🦈 🐦🦈 !!!
+      throw new Error(
+        field === "username"
+          ? "Username already taken"
+          : "Duplicate value detected"
+      );
+    }
+
+    // fallback
+    throw new Error("Failed to update user");
   }
 }
 
-export async function fetchUser(userId: string | number | Record<string, string>[]) {
+
+export async function fetchUser(userId: string, ): Promise<IUser | null>  {
   try {
     await connectTODB();
 
-    return await User.findOne({ id: userId }).populate({
-      path: "communities",
-      model: Community,
-    });
+    const user = await User.findOne({ id: userId })
+      .populate({
+          path: "communities",
+          model: Community, // Ensure you import Community model
+        }); // You don't even need .lean() if you use the trick below
+
+    if (!user) return null;
+
+    // 🔨 THE FIX: This converts all ObjectId classes to Strings automatically
+    return JSON.parse(JSON.stringify(user));
+
   } catch (error: any) {
     throw new Error(`Failed to fetch User: ${error.message}`);
   }
@@ -115,7 +145,7 @@ export async function fetchUsers({
   sortBy?: SortOrder;
 }) {
   try {
-   await  connectTODB();
+   await connectTODB();
     const skipAmount = (pageNumber - 1) * pageSize;
 
     // CASE INSENSITIVE REG
@@ -180,4 +210,57 @@ export async function getActivity(userId: string) {
     console.error("Error fetching replies: ", error);
     throw error;
   }
+
 }
+
+  export async function deleteUser(userId : string ) {
+
+    try{
+      await connectTODB();
+
+    // 1️⃣ Fetch the user first
+    const user = await User.findOne({ id: userId });
+    if (!user) return;
+
+    const fallback = {
+      name: "Deleted User",
+      image: "/nouser.jpg",
+      username: "deleted_user",
+      bio: user.bio ?? "",
+    };
+
+    // 2️⃣ Update threads: keep original threads but store fallback
+    await Thread.updateMany(
+      { author: userId },
+      {
+        $set: {
+          author: null,
+          authorFallback: fallback,
+        },
+      }
+    );
+
+    // 3️⃣ Update communities: update member fallback
+    await Community.updateMany(
+      { "members.user": userId },
+      {
+        $set: {
+          "members.$[m].fallback": fallback,
+          "members.$[m].user": null,
+        },
+      },
+      {
+        arrayFilters: [{ "m.user": userId }],
+      }
+    );
+
+    // 4️⃣ Delete the user
+    await User.deleteOne({ id: userId });
+
+
+    console.log(`User ${userId} deleted, threads and communities updated with fallback.`);
+    }
+    catch(error){
+    console.log('Failed To Delete User', error)
+    }
+  } 

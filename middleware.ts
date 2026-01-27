@@ -15,26 +15,25 @@ const isPublicRoute = createRouteMatcher([
 export default clerkMiddleware(async (auth, req: NextRequest) => {
   const { userId, sessionClaims } = await auth();
 
-  // 1. Allow public routes (sign-in, sign-up, webhooks) to pass through immediately
+  //  Allow public routes (sign-in, sign-up, webhooks) to pass through immediately
   if (isPublicRoute(req)) {
     return NextResponse.next();
   }
 
-  // 2. Protect all other routes
   if (!userId) {
     await auth.protect();
   }
 
-  // 3. Handle Onboarding bypass
+  //  Handle Onboarding bypass
   if (userId && isOnboardingRoute(req)) {
     return NextResponse.next();
   }
 
-  // 4. Metadata sync for first-time users
+  //  Metadata sync for first-time users
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-pathname', req.nextUrl.pathname);
   
-  // Note: Ensure your Clerk JWT template includes "metadata"
+  // Ensure your Clerk JWT template includes "metadata"
   if (sessionClaims?.metadata?.isFirstTimeUser) {
     requestHeaders.set('x-first-time', 'true');
   }

@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { IncomingHttpHeaders } from "http";
 import { NextResponse } from "next/server";
 import { createClerkClient } from '@clerk/nextjs/server'
-import { currentUser } from "@clerk/nextjs/server";
+
 
 import {
   addMemberToCommunity,
@@ -64,11 +64,11 @@ type Event = {
     
     const { id, first_name, last_name, image_url,bio, email_addresses, username } = evnt?.data;
     try {
-
       const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
       await clerkClient.users.updateUserMetadata(id as string, {
         publicMetadata: {
           isFirstTimeUser: true,
+          onboarding: true,
         },
       });
       
@@ -181,7 +181,6 @@ type Event = {
     }
   }
   
-
   // Listen organization updation event
   if (eventType === "organization.updated") {
     try {

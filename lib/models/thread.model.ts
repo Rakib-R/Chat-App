@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { shareCount } from "../actions/share.actions";
 
 const threadSchema = new mongoose.Schema({
   text: {
@@ -8,8 +9,17 @@ const threadSchema = new mongoose.Schema({
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true,
+    required: false,
   },
+
+//  FOR DELETED USERS / AUTHORS
+  authorFallback: {
+  name: { type: String, default: "Deleted User" },
+  image: { type: String, default: "/nouser.jpg" },
+  bio: { type: String, default: "" },
+  username: { type: String, default: "deleted_user" },
+},
+
   community: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Community",
@@ -22,7 +32,22 @@ const threadSchema = new mongoose.Schema({
   parentId : {
     type : String,
   },
-  
+
+   likeCount: {
+    type: Number,
+    default: 0,
+  },
+
+   shareCount: {
+    type: Number,
+    default: 0, 
+  },
+
+   tagCount: {
+    type: Number,
+    default: 0,
+  },
+
   children: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -31,6 +56,6 @@ const threadSchema = new mongoose.Schema({
   ],
 });
 
-const Thread = mongoose.models.Thread || mongoose.model("Thread", threadSchema);
+const Thread = mongoose.models?.Thread || mongoose.model("Thread", threadSchema);
 
 export default Thread;

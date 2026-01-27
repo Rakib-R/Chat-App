@@ -1,23 +1,16 @@
 {
-  "name": "typescript_mongo_next",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "nodemon --exec ts-node --project tsconfig.server.json server.ts",
-    "build": "next build && tsc --project tsconfig.server.json",
-    "start": "NODE_ENV=production node dist/server.js",
-    "lint": "next lint"
-  },
   "dependencies": {
     "@clerk/elements": "^0.23.89",
     "@clerk/localizations": "^3.30.0",
     "@clerk/nextjs": "^6.21.0",
     "@clerk/themes": "^2.4.46",
+    "@fakerjs/paragraph": "^1.0.0",
     "@hookform/resolvers": "^5.1.1",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tabs": "^1.1.13",
     "@uploadthing/react": "^7.3.1",
+    "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "express": "^5.2.1",
@@ -37,19 +30,36 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
     "uploadthing": "^7.7.2",
-    "zod": "^3.25.57"
+    "zod": "^3.25.57",
+    "zod-schema-faker": "^2.1.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.2.0",
+    "@next/bundle-analyzer": "^16.1.4",
     "@tailwindcss/postcss": "^4",
     "@types/express": "^5.0.6",
     "@types/node": "^20.19.30",
     "@types/react": "^19.2.9",
     "@types/react-dom": "^19.2.3",
     "@types/uuid": "^10.0.0",
+    "cross-env": "^10.1.0",
     "nodemon": "^3.1.11",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "tw-animate-css": "^1.3.4",
     "typescript": "^5"
-  }
+  },
+  "name": "typescript_mongo_next",
+  "private": true,
+  "scripts": {
+    "⛵️ ⭐☁️☁️ 👇 BELOW IS NODEJS and 👆 ABOVE IS NODEMON ☁️☁️ 🐦🦈 🟢": "NODE JS AND TYPESCRIPT",
+    "analyze": "cross-env ANALYZE=true next build",
+    "build": "next build && tsc --project tsconfig.server.json",
+    "dev": "nodemon --exec ts-node --project tsconfig.server.json server.ts",
+    "dev_NODE!": "tsc --project tsconfig.server.json --watch",
+    "dev:server": "node dist/server.js",
+    "lint": "next lint",
+    "start": "NODE_ENV=production node dist/server.js"
+  },
+  "version": "0.1.0"
 }

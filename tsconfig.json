@@ -7,7 +7,7 @@
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "esnext",
+    "module": "esnext",            // <--- KEEP THIS MODERN
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -18,20 +18,17 @@
         "name": "next"
       }
     ],
-    
     "paths": {
       "@/*": ["./*"]
     }
   },
-  //MY ADDED FOR UPLOADTHING EXPERIMENT
-   "jsx": "react-jsx",
-
   "include": [
     "next-env.d.ts", 
-    "**/*.ts", "**/*.tsx", ".next/types/**/*.ts",
-    "typings.d.ts",
+    "**/*.ts", 
+    "**/*.tsx", 
+    ".next/types/**/*.ts",
+    "typings.d.ts", 
+    "next.config.mjs"
   ],
-  "exclude": ["node_modules"],
-
-
+  "exclude": ["node_modules"]
 }

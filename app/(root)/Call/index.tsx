@@ -70,7 +70,7 @@ export default function Home() {
               variants={itemVariants}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              className='flex gap-2 bg-indigo-900 p-4 rounded-lg hover:cursor-pointer border border-indigo-500/30 backdrop-blur-sm'
+              className='flex gap-2 z-40 bg-indigo-900 p-4 rounded-lg hover:cursor-pointer border border-indigo-500/30 backdrop-blur-sm'
               onClick={() => createMeeting('audio')}
             >
               <span>🎙️</span> 
@@ -82,7 +82,7 @@ export default function Home() {
               variants={itemVariants}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              className='flex gap-2 bg-indigo-900 p-4 rounded-lg hover:cursor-pointer border border-indigo-500/30 backdrop-blur-sm'
+              className='flex gap-2 z-40 bg-indigo-900 p-4 rounded-lg hover:cursor-pointer border border-indigo-500/30 backdrop-blur-sm'
               onClick={() => createMeeting('video')}
             >
               <span>📹</span>

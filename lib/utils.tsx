@@ -1,3 +1,4 @@
+
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -41,8 +42,16 @@ export function formatThreadCount(count: number): string {
   }
 }
 
+export async function getRandomUser() {
+  const res = await fetch('https://randomuser.me/api/', { cache: 'no-store' }); // Ensure fresh data on every request
+  if (!res.ok) throw new Error('Failed to fetch user');
+  const data = await res.json();
+  return data.results[0];
+}
+
 
 export function truncateText(str:string, limit:number) {
   if (str.length <= limit) return str;
   return str.slice(0, limit).trim() + "  ....";
 }
+

@@ -1,15 +1,15 @@
 import {
   generateUploadButton,
   generateUploadDropzone,
-  generateReactHelpers
+  generateReactHelpers,
 } from "@uploadthing/react";
-import { type OurFileRouter } from "@/app/api/uploadthing/core";
 
-// EXAMPLE FROM DOCS
+// DO NOT import 'ourFileRouter' directly from the server file here
 
+import type { OurFileRouter } from "@/app/api/uploadthing/core";
 
 export const UploadButton = generateUploadButton<OurFileRouter>();
 export const UploadDropzone = generateUploadDropzone<OurFileRouter>();
-export const { useUploadThing, uploadFiles } =
-  generateReactHelpers<OurFileRouter>();
 
+// This hook is what you use in your Profile Pic component
+export const { useUploadThing, uploadFiles } = generateReactHelpers<OurFileRouter>();
