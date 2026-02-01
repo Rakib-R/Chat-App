@@ -17,10 +17,68 @@ export interface IUser {
   bio?: string;
   image?: string;
   onboarded: boolean;
-  threads: Types.ObjectId[]; // single or array
+  threads: Types.ObjectId[];
+}
+
+export async function checkEmailAvailability({
+  email,
+  username,
+}: { email?: string; username?: string; }) 
+{
+  await connectTODB();
+
+  let isTaken = false;
+  // UserName Check
+  let isTakenName = false;
+  if (username) {
+    const user_name = await User.findOne({ username : username });
+    isTakenName = !!user_name; // true if user exists
+  }
+  // EMAIL CHECK
+    let isTakenEmail = false;
+  if (email) {
+    const user_email = await User.findOne( { email : email});
+    isTakenEmail = !!user_email; // true if email exists
+  }
+
+  isTaken = isTakenName || isTakenEmail;
+  return {isTaken}
 }
 
 
+import { clerkClient } from "@clerk/nextjs/server";
+
+export async function updateClerkUserImage({
+  userId,
+  imageUrl,
+}: {
+  userId: string;
+  imageUrl: string;
+}) {
+  try {
+    const client = await clerkClient();
+    
+    // Update user's profile image URL
+    await client.users.updateUser(userId, {
+      publicMetadata: {
+        profileImageUrl: imageUrl,
+      },
+    });
+
+    // Alternatively, if you want to set it as the primary image:
+    // await client.users.updateUserProfileImage(userId, {
+    //   file: imageUrl, // This should be a file blob or URL
+    // });
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error updating Clerk user image:", error);
+    return { 
+      success: false, 
+      error: error.message || "Failed to update profile image" 
+    };
+  }
+}
 export async function updateUser({
   userId,
   bio,
@@ -49,14 +107,13 @@ export async function updateUser({
       revalidatePath(path);
     }
 
-  console.log('User Created BEFORE new Promise ')
+  console.log('User Created')
    return updateUser;
 
   } catch (error: any) {
     // 🔥 DUPLICATE KEY (username, email, etc.)
     if (error?.code === 11000) {
       const field = Object.keys(error.keyValue)[0];
-
       //// these funcking erroes doesnt show up 🐦🦈 🐦🦈 !!!
       throw new Error(
         field === "username"
@@ -64,7 +121,6 @@ export async function updateUser({
           : "Duplicate value detected"
       );
     }
-
     // fallback
     throw new Error("Failed to update user");
   }

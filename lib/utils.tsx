@@ -1,4 +1,5 @@
 
+
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -31,7 +32,7 @@ export function formatDateString(dateString: string ) {
   return `${time}, ${formattedDate}`;
 }
 
-// created by chatgpt
+
 export function formatThreadCount(count: number): string {
   if (count === 0) {
     return "No Threads";
@@ -52,6 +53,5 @@ export async function getRandomUser() {
 
 export function truncateText(str:string, limit:number) {
   if (str.length <= limit) return str;
-  return str.slice(0, limit).trim() + "  ....";
+  return str.slice(0, limit).trim() + "  Read More...";
 }
-

@@ -1,3 +1,4 @@
+
 export const dynamic = 'force-static';
 export const revalidate = 3600;
 
@@ -20,7 +21,7 @@ export default async function Chats() {
   const users = await getCachedUsers();
 
   return (
-    <main className='flex z-1 flex-col w-full bg-red-100 min-h-screen overflow-auto'>
+    <main className='flex flex-col z-1 w-full rounded-2xl bg-red-100 min-h-screen overflow-auto'>
       <input type="text" placeholder="Search chats..." className='bg-red-600 p-2 text-white placeholder:text-red-200 outline-none'/>
       
       <div className="flex flex-col divide-y divide-red-200">

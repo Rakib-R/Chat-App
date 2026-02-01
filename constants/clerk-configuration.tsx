@@ -42,5 +42,7 @@
         className: "!bg-indigo-600 hover:!bg-indigo-700 !transition-all duration-300 rounded-lg !py-3 text-lg !font-bold !uppercase"
       },
 
+       organizationPreviewTextContainer: "block", // Ensures name container is visible
+        organizationPreviewMainIdentifier: "text-white font-bold", // Styles the name
       }
   }

@@ -6,14 +6,25 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*TODO autoComplete + LastPass Turning Off */
+[autocomplete="off"] + div[data-lastpass-icon-root="true"] {
+    display: none;
+}
 
+[autocomplete="off"] + div[data-lastpass-infield="true"] {
+    display: none;
+}
 /*TODO ALL ABOUT CLERK */
 
 /* ROOT PAGE CLERK footer FREAKING WORKING*/
 .cl-internal-l2l775{ display: none;}
 /* AUTH PAGE CLERK FOOTER WORKING !!! */
 .cl-internal-pe6vm4 { display: none;}
+.cl-internal-1ktyd3d{color: wheat}
 
+.cl-userPreviewMainIdentifierText{
+  color : white
+}
 /* ORGANIZATION SWITCHER  WORKING WORKNG !!*/
 .cl-organizationPreview{ color :white}
 .cl-organizationSwitcherTriggerIcon { color : white}
@@ -21,6 +32,7 @@
 .cl-userPreviewSecondaryIdentifier, .cl-userPreviewSecondaryIdentifier__userButton{
   color: rgb(0, 9, 0);
 }
+.cl-userButtonPopoverActionButton .cl-button { color: white}
 
 /* SIGN UP "Optional" placeholder text WORKING !!!!!*/
 .cl-internal-xootgu{
@@ -47,7 +59,6 @@
   height: 4rem;
   background-color : transparent;
 }
-
 .cl-avatarImage
 {
   transform: translate(25%, 25%);
@@ -63,24 +74,48 @@
 .cl-organizationPreviewMainIdentifier .cl-organizationPreviewMainIdentifier__organizationSwitcherTrigger{
   color : blue
 }
-
+/*TODO root clerk main component */
+.cl-userButtonPopoverCard, .cl-popoverBox{
+  font-family : 'roboto';
+  padding: 12px;
+  background-color: rgb(254, 253, 253);
+  color: wheat;
+}
+  /*TODO ORGANIZATION && USER MAIN_CARD */
+ .cl-organizationSwitcherPopoverMain, .cl-userButtonPopoverMain{
+  background-color: #3b82f6;
+  color: wheat;
+ }
   /* CLERK heading text */
 .zIgDIc #headingText {
   font-size: larger;
 }
 
-/* root clerk main component */
-.cl-userButtonPopoverCard, .cl-popoverBox{
-  font-family : 'roboto';
-  padding: 12px;
-}
 
 /* manage accound and sign out */
 .cl-userButtonPopoverActions .cl-userButtonPopoverActions__singleSession{
   font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
+ .cl-card { background-color: white}
 
+
+.cl-footerActionText, 
+.cl-footerAction {
+  display: flex;
+  align-items :center;
+  font-size: 14px ;
+  color: #3b82f6;
+  vertical-align: middle;
+  line-height: 16px;
+}
+
+
+/* dark.css */
+/*TODO Image Filter DarkMode */
+img:not([src*='.svg']) {
+  filter: var(--image-filter);
+}
  /* ** ****GEMINI ****** */
 /* This targets the title you defined in the localization object */
 /* This creates a look where the second half of the line is a different color */
@@ -109,23 +144,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
- .cl-card { background-color: rgb(255, 254, 254);}
 
-
-/* // FOOTER COLOR */
- .cl-internal-1dauvpw {
-   background-color: #3b82f6
-}
-
-.cl-footerActionText, 
-.cl-footerAction {
-  display: flex;
-  align-items :center;
-  font-size: 14px ;
-  color: #3b82f6;
-  vertical-align: middle;
-  line-height: 16px;
-}
 
 /* To hide the hint text safely */
 [data-clerk-element="formFieldHintText"] {
@@ -133,15 +152,53 @@
 }
 
 .cl-organizationPreviewMainIdentifier {
-  color: blue !important;
+  color: white !important;
 }
 
 
 @layer base { 
 
-  
 }
+/* TODO SHIMMER SKELETON ANIMATION */
+/* The Shimmer Container */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+/* The Moving Light Streak */
+.shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  /* This gradient creates the 'streak' of light */
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.02) 20%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 :root {
+
+  /*TODO dark.css DARK MODE SPECIFIED IMAGE FEATURE*/
+--icon-filter: invert(100%);
+--icon-filter_hover: invert(40%);
+--icon-filter_hover: invert(60%);
+
   --radius : 0.625rem;
   --card : oklch(1 0 0);
    --background : oklch(1 0 0);

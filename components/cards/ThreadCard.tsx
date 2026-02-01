@@ -4,11 +4,7 @@ import React, { useState } from 'react'
 import Image from 'next/image';
 import { formatDateString, truncateText } from '@/lib/utils';
 import { headers } from 'next/headers'
-import { OrganizationMembership } from '@clerk/nextjs/server';
 import SocialMedia from '../features/SocialMedia';
-
-const fallbackUser = {name : 'No User', image : './nouser.jpg'};
-
 
 interface Props {
     id: string;
@@ -34,13 +30,6 @@ interface Props {
         };
     }[];
     isComment?: boolean;
-
-    orgId?: string;
-    orgName?: string;
-    orgImg?: string;
-    role?: string | boolean;
-    orgMembers?: OrganizationMembership[];
-    joinedAt?:number
 }
 
 const ThreadCard = async ({
@@ -62,14 +51,13 @@ const ThreadCard = async ({
     const isProfileRoute = getPathName?.includes('profile')    
     const showFullCommunityLink = !isComment && !isProfileRoute && Boolean(community);
 
-
   return (
      <main className='flex w-156 flex-col my-8'>
-
-        <section className={`flex p-4 gap-4 flex-row rounded-xl bg-slate-800 ${isComment ? "ml-4"  : ""}  `}>
+        <section className={`flex p-4 gap-6 flex-row rounded-xl bg-slate-800 ${isComment ? "ml-4"  : ""}  `}>
              <header className='flex flex-col relative'>
                 <Link href={`/profile/${author.id}`} className={` ? relative rounded-2xl h-16 w-16 text-white: "" `} >
-                <figure><Image src={author.image || ''} alt={''}width={`${isComment ? 40 : 80}`} height={`${isComment ? 40 : 80}`}
+                <figure className='cursor:pointer'><Image src={author.image || '/user_avater.png'} alt={''}width={`${isComment ? 40 : 80}`} 
+                height={`${isComment ? 40 : 80}`}
                     className='cursor-pointer aspect-square rounded-[2rem]' priority/>
                 </figure>
                     
@@ -88,8 +76,7 @@ const ThreadCard = async ({
                         <Link href={`/thread/${id}`}> 
                      {content }
                     </Link>
-                    ) : (
-                        <Link href={`/thread/${id}`}> 
+                    ) : ( <Link href={`/thread/${id}`}> 
                      {truncateText(content , 100)}
                     </Link>
                     )}                  
@@ -110,10 +97,10 @@ const ThreadCard = async ({
             <div className="flex gap-2 items-center">
             <p className="text-[14px]">{community?.name}</p>
             <figure>
-                   <img
+                <Image
                 className='rounded-md'
-                src={community?.image}
-                alt={community?.name}
+                src={community?.image || '/community.svg'}
+                alt={community?.name || 'community'}
                 width={18}
                 height={18}
                 />
@@ -133,7 +120,6 @@ const ThreadCard = async ({
                 )}
 
             {/* TO SHOW THIS IS NOT A COMMENT CAUSE COMMENT HAS NO PARENT-ID ! */}
-
             {(!isThreadRoute || parentId ) &&
                 <Link href={`/thread/${id}`}>
                 <div className='mt-1 text-white text-sm'>

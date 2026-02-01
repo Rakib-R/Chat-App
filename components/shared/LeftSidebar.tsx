@@ -38,10 +38,9 @@ const LeftSidebar = ({userDBImage : userDBImage} : imageProps) => {
                           group-hover:opacity-50 group-hover:scale-105 group-hover:blur-none 
                           transition-all duration-300 ease-out rounded-lg pointer-events-none" />
              <figure>
-               <img 
-                  className='rounded-full h-[4.5vh] w-[2vw] relative z-10 
+               <Image className='rounded-full h-[4.5vh] w-[2vw] relative z-10 
                   transition-transform group-hover:scale-110' 
-                  src={userDBImage || user?.imageUrl} 
+                  src={userDBImage || user?.imageUrl || '/user_avatar.png'} 
                   width={72}
                   height={64}
                   alt="" 

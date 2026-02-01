@@ -18,10 +18,14 @@ type PageProps = {
   }>;
 };
 
+//! Helper to simulate network delay
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 
 async function Home ({ searchParams}:  PageProps) {
   const user = await currentUser();
 
+   await delay(5000); 
  // FIX: If not logged in, send to sign-in (instead of returning null)
   if (!user) redirect("/sign-in");
 

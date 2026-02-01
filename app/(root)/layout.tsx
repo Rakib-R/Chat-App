@@ -23,6 +23,7 @@ import { UploadErrorBoundary } from '@/components/Error-Boundary';
 import { fetchUser } from '@/lib/actions/user.actions';
 import { Suspense } from 'react';
 import FeedSkeleton from '@/components/skeletons/FeedSkeleton';
+import { redirect } from 'next/navigation';
 
 
 // META DATA & FONT STAFF -- META DATA & FONT STAFF - META DATA & FONT STAFF
@@ -51,8 +52,12 @@ const roboto = Roboto({
   }>) {
 
   // CLERK APPEARACNES --- CLERK APPEARACNES 
-  const user = await currentUser();
-  const isFirstTime = !!user?.publicMetadata?.isFirstTimeUser;
+    const clerkUser = await currentUser();
+    if (!clerkUser) return null;
+  const userInfo = await fetchUser(clerkUser.id);
+  const userImage = userInfo?.image || clerkUser.imageUrl;
+  
+  const isFirstTime = !!clerkUser?.publicMetadata?.isFirstTimeUser;
   
   customAppearance as Appearance
 
@@ -71,11 +76,6 @@ const roboto = Roboto({
      loading: () => <p>Loading</p>
   })
 
-  const clerkUser = await currentUser();
-    if (!clerkUser) return null;
-  const userInfo = await fetchUser(clerkUser.id);
-  const userImage = userInfo?.image || clerkUser.imageUrl;
-
 
   return (
     <UploadErrorBoundary>
@@ -85,9 +85,11 @@ const roboto = Roboto({
       <html lang="en" className={`h-screen ${geist.className} ${roboto.className}`} >
         <body className={`antialiased mx-8 h-full flex flex-col gap-0 justify-between text-gray-900`} >
           <nav className="flex px-8 rounded-md justify-between z-50
-          bg-gradient-to-tr from-gray-900 via-gray-800 to-gray-700 text-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] brightness-100 ">
+          bg-gradient-to-tr from-gray-900 via-gray-800 to-gray-700
+           text-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] brightness-100 ">
             <Topbar/>
-            <p className='font-black self-center'>THIS IS INSIDE IN THE ROOT LAYOUT and TOPBAR</p>
+            <p className='font-black self-center'>THIS IS INSIDE IN THE ROOT LAYOUT 
+              and TOPBAR</p>
             {/* <OrganizationProfile /> */}
             <OrganizationSwitcher />
 
@@ -100,15 +102,14 @@ const roboto = Roboto({
             </SignedIn>
           </nav>
 
-        <main className='flex flex-1 justify-between overflow-hidden'>
+        <main className='flex flex-1 justify-between'>
           <LeftSidebar userDBImage={userImage}/>
-        <Suspense fallback={<FeedSkeleton />}>
+  
           {children}
-        </Suspense>
 
         <RightSidebar isFirstTime={isFirstTime}>
           <Suspense>
-          <DynamicChat />
+            <DynamicChat />
           </Suspense>
         </RightSidebar>
 
